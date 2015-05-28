@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: Zoe
+        psr4_prefix: Zoe
+        src_path: app
