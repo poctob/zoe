@@ -12,6 +12,7 @@ class Kernel extends ConsoleKernel {
 	 */
 	protected $commands = [
 		'Zoe\Console\Commands\Inspire',
+                'Zoe\Console\Commands\Convert',
 	];
 
 	/**
