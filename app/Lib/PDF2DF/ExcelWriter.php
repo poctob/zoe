@@ -58,13 +58,13 @@ class ExcelWriter implements iExcel {
                     ->setDescription("Converted Medicaid EOB data.");
             
             $this->workbook->sheet('Exported Data');
-            $this->workbook->setActiveSheetIndex(0);
-
             $this->initialized = TRUE;
         } catch (Exception $e) {
             \Log::error('ExcelWriter:__construct: ' . $e->getMessage());
         }
     }
+    
+  
 
     /**
      * Adds currency cell to the spreadsheet.
@@ -73,20 +73,20 @@ class ExcelWriter implements iExcel {
      * @param int $col
      */
     public function addCurrency($data, $row, $col) {
-        if ($this->initialized && isset($data) && strlen($data) > 0) {
+        if ($this->initialized && isset($data) && $data > 0) {
 
             if (isset($this->workbook)) {
                 $this->workbook
-                        ->getActiveSheet()
+                        ->getSheet()
                         ->getCellByColumnAndRow($col, $row)
                         ->getStyle()
                         ->getNumberFormat()
                         ->setFormatCode(self::CURRENCY_FORMAT);
 
                 $this->workbook
-                        ->getActiveSheet()
+                        ->getSheet()
                         ->getCellByColumnAndRow($col, $row)
-                        ->setValueExplicit($data, \PHPExcel_Cell_DataType::TYPE_STRING);
+                        ->setValueExplicit($data, \PHPExcel_Cell_DataType::TYPE_NUMERIC);
             }
         }
     }
@@ -98,20 +98,20 @@ class ExcelWriter implements iExcel {
      * @param int $col
      */
     public function addDate($data, $row, $col) {
-        if ($this->initialized && isset($data) && strlen($data) > 0) {
+        if ($this->initialized && isset($data) && $data > 0) {
 
             if (isset($this->workbook)) {
                 $this->workbook
-                        ->getActiveSheet()
-                        ->getCellByColumnAndRow($col, $row)
-                        ->setValue(\PHPExcel_Shared_Date::PHPToExcel($data));
-
-                $this->workbook
-                        ->getActiveSheet()
+                        ->getSheet()
                         ->getCellByColumnAndRow($col, $row)
                         ->getStyle()
                         ->getNumberFormat()
                         ->setFormatCode(self::CUSTOM_DATE_FORMAT);
+                
+                $this->workbook
+                        ->getSheet()
+                        ->getCellByColumnAndRow($col, $row)
+                        ->setValue(\PHPExcel_Shared_Date::PHPToExcel($data));
             }
         }
     }
@@ -124,18 +124,18 @@ class ExcelWriter implements iExcel {
         if ($this->initialized && isset($header) && strlen($header) > 0) {
 
             if (isset($this->workbook)) {
-                $this->headers . add($header);
+                $this->headers[]=$header;
                 $this->addString($header, 1, count($this->headers) - 1);
                 $styleArray = array(
                     'font' => array(
                         'bold' => true,
                     ),
                     'alignment' => array(
-                        'center' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                        'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
                 ));
 
                 $this->workbook
-                        ->getActiveSheet()
+                        ->getSheet()
                         ->getCellByColumnAndRow(count($this->headers) - 1, 1)
                         ->getStyle()
                         ->applyFromArray($styleArray);
@@ -154,7 +154,7 @@ class ExcelWriter implements iExcel {
 
             if (isset($this->workbook)) {
                 $this->workbook
-                        ->getActiveSheet()
+                        ->getSheet()
                         ->getCellByColumnAndRow($col, $row)
                         ->setValueExplicit($data, \PHPExcel_Cell_DataType::TYPE_STRING);
             }
