@@ -54,11 +54,11 @@ class Table {
      * @param string $output Output file name
      * @param \Zoe\Lib\PDF2DF\iAlert $alert iAlert object
      */
-    public function __construct($output, iAlert $alert) {
+    public function __construct(iExcel $excel, iAlert $alert) {
         $this->header = 'None';
         $this->footer = 'None';
         $this->columns = array();
-        $this->xwriter = new ExcelWriter($output);
+        $this->xwriter = $excel;
         $this->claims = array();
         $this->col_map = config('zoe.columns');
         $this->alert = $alert;
