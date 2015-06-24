@@ -159,7 +159,7 @@ class ExcelWriterTest extends TestCase {
         $this->assertEquals($input, $actual);
     }
 
-    private function getOutput() {
+    private function getOutput() {       
         $reader = Excel::load('storage/exports/' . $this->file . '.xls');
         $reader->noHeading();
         $items = $reader->toArray();

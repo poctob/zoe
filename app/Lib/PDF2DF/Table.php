@@ -51,7 +51,7 @@ class Table {
 
     /**
      * Default constructor.
-     * @param string $output Output file name
+     * @param \Zoe\Lib\PDF2DF\iExcel $excel Output file name
      * @param \Zoe\Lib\PDF2DF\iAlert $alert iAlert object
      */
     public function __construct(iExcel $excel, iAlert $alert) {
