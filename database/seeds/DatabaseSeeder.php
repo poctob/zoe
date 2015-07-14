@@ -14,7 +14,27 @@ class DatabaseSeeder extends Seeder {
 	{
 		Model::unguard();
 
-		// $this->call('UserTableSeeder');
+                $this->call('SubClaimTableSeeder');
+		$this->call('ClaimTableSeeder');
+                
 	}
 
+}
+
+class ClaimTableSeeder extends Seeder {
+ 
+       public function run()
+       {
+         //delete users table records
+         DB::table('claim')->delete();
+       }
+}
+
+class SubClaimTableSeeder extends Seeder {
+ 
+       public function run()
+       {
+         //delete users table records
+         DB::table('subclaim')->delete();
+       }
 }

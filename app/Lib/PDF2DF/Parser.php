@@ -57,7 +57,7 @@ class Parser {
     /**
      * Title page number.
      */
-    const TITLE_PAGE = 1;
+    const TITLE_PAGE = 0;
 
     /**
      * Principal constructor, initializes member variables.
@@ -67,14 +67,14 @@ class Parser {
             iProgress $progressable) {
         $this->input = $input;
         $this->alert = $alert;
-        $this->progressable = progressable;
+        $this->progressable = $progressable;
         $this->ready = false;
         $this->headers_set = false;
 
         if (file_exists($input)) {
             try {
                 $this->parser = new \Smalot\PdfParser\Parser();
-                $this->table = new Table(new ExcelWriter($output));
+                $this->table = new Table(new ExcelWriter($output), $this->alert);
                 $this->columns = array();
             } catch (Exception $e) {
                 \Log::error('Parser:__construct: ' . $e->getMessage());
@@ -84,15 +84,17 @@ class Parser {
                             'Converter Error', 'ERROR_MESSAGE');
                 }
 
-                $this->ready = true;
+                $this->ready = false;
             }
             $this->delimiters = config('zoe.delimiters');
-            if (isset($this->delimiters) || count($this->delimiters) == 0) {
+            if (is_null($this->delimiters) || count($this->delimiters) == 0) {
                 if (isset($this->alert)) {
                     $this->alert->showAlert('Unable to initialize properties file!!',
                             'Converter Error', 'ERROR_MESSAGE');
                 }
             }
+            
+            $this->ready = true;
         }
     }
 
@@ -107,22 +109,22 @@ class Parser {
             $tables = null;
 
             try {
-                $pdDoc = $this->parser->parseFile($this->input);
-                $title = $this->convertTitlePage($pdDoc);
+                $pdDoc = $this->parser->parseFile($this->input);                
                 $pages = $pdDoc->getPages();
+                $title = $this->convertTitlePage($pages);
                 $numberOfPages = count($pages);
 
                 if (isset($this->progressable)) {
-                    $this->progressable . setMax(count($numberOfPages));
+                    $this->progressable->setMax(count($numberOfPages));
                 }
 
-                for ($i = TITLE_PAGE + 1;
-                        $i <= $numberOfPages;
+                for ($i = self::TITLE_PAGE + 1;
+                        $i < $numberOfPages;
                         $i++) {
                     $tables = $this->extractTables($pages, $i);
                     $this->buildTable($tables);
-                    if ($this->progressable != null) {
-                        $this->progressable . setCurrent($i);
+                    if (isset($this->progressable)) {
+                        $this->progressable->setCurrent($i);
                     }
                 }
 
@@ -141,14 +143,15 @@ class Parser {
      * @param page String of raw text from the PDF page.
      */
     private function buildTable($page) {
+        
         $thead = '';
         $separator = '';
         $chead = '';
         $data = '';
         $tfoot = '';
 
-        splitPage($page, $thead, $separator, $chead, $data, $tfoot);
-
+        $this->splitPage($page, $thead, $separator, $chead, $data, $tfoot);
+        
         if (!$this->headers_set) {
             $this->table->setHeader($thead);
             $this->table->setFooter($tfoot);
@@ -198,7 +201,7 @@ class Parser {
      */
     private function buildColumns($separator, $heads) {
         $sep = trim($separator);
-        $seps = explode("\\" . $this->delimiters['BOX_SEPARATOR'], $sep);
+        $seps = explode($this->delimiters['BOX_SEPARATOR'], $sep);
 
         foreach ($seps as
                 $s) {
@@ -210,8 +213,8 @@ class Parser {
         }
 
         try {
-            $separator = "\r\n";
-            $line = strtok($heads, $separator);
+            $line_sep = "\r\n";
+            $line = strtok($heads, $line_sep);
             while ($line !== FALSE) {
                 //skip first separator
                 $ss = substr(trim($line), 1);
@@ -222,7 +225,7 @@ class Parser {
                     $c->setHeader($c->getHeader() . "\n" . trim($header));
                     $ss = substr($ss, $c->getWidth() + 1);
                 }
-                $line = strtok($separator);
+                $line = strtok($line_sep);
             }
         } catch (Exception $ex) {
             \Log::error('Parser:buildColumns: ' . $e->getMessage());
@@ -240,18 +243,20 @@ class Parser {
      * @param tfoot Reference to footer.
      */
     private function splitPage($page, &$thead, &$separator, &$chead, &$data,
-            &$foot) {
-        if (isset($page) && isset($thead) && isset($chead) && isset($data) && isset($tfoot) && isset($separator) && strlen($page) > 0) {
-
+            &$tfoot) {
+        
+        
+        if (isset($page) && strlen($page) > 0) {
+            
             try {
-                $separator = "\r\n";
-                $line = strtok($page, $separator);
-
+                $line_end = "\r\n";
+                $line = strtok($page, $line_end);                
+                
                 //Extract table head first
                 while ($line !== FALSE && !$this->isHeaderSeparator($line)) {
 
                     $thead .= $line . "\n";
-                    $line = strtok($separator);
+                    $line = strtok($line_end);
                 }
 
                 if ($line == FALSE) {
@@ -260,12 +265,12 @@ class Parser {
 
                 //Skip separator
                 $separator .= $line;
-                $line = strtok($separator);
+                $line = strtok($line_end);
 
                 //Extract column heads next
                 while ($line !== FALSE && !$this->isHeaderSeparator($line)) {
                     $chead .= $line . "\n";
-                    $line = strtok($separator);
+                    $line = strtok($line_end);
                 }
 
                 if ($line == FALSE) {
@@ -273,12 +278,12 @@ class Parser {
                 }
 
                 //Skip separator
-                $line = strtok($separator);
+                $line = strtok($line_end);
 
                 //Data next
                 while ($line !== FALSE && !$this->isHeaderSeparator($line)) {
                     $data .= $line . "\n";
-                    $line = strtok($separator);
+                    $line = strtok($line_end);
                 }
 
                 if ($line == FALSE) {
@@ -287,12 +292,12 @@ class Parser {
 
 
                 //Skip separator
-                $line = strtok($separator);
+                $line = strtok($line_end);
 
                 //Table footer
                 while ($line !== FALSE) {
                     $tfoot .= $line . "\n";
-                    $line = strtok($separator);
+                    $line = strtok($line_end);
                 }
             } catch (Exception $ex) {
                 \Log::error('Parser:splitPage: ' . $e->getMessage());
@@ -351,7 +356,7 @@ class Parser {
      */
     private function convertTitlePage($doc) {
         try {
-            return $doc[TITLE_PAGE]->getText();
+            return $doc[self::TITLE_PAGE]->getText();
         } catch (Exception $ex) {
             \Log::error('Parser:convertTitlePage: ' . $e->getMessage());
         }
@@ -366,13 +371,10 @@ class Parser {
     public function getInput() {
         return $this->input;
     }
-
-    /**
-     * setter
-     * @param input 
-     */
-    public function setInput($input) {
-        $this->input = $input;
+    
+    public function isReady() {
+        return $this->ready;
     }
+
 
 }

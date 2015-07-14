@@ -23,7 +23,7 @@ class CreateClaim extends Migration {
                         $table->string('STS');
                         $table->string('recipientID');
                         $table->string('recipient');
-                        $table->string('edits');                        
+                        $table->string('edits')->nullable();                        
                         
 			$table->timestamps();
 		});

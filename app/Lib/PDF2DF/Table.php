@@ -62,7 +62,8 @@ class Table {
         $this->claims = array();
         $this->col_map = config('zoe.columns');
         $this->alert = $alert;
-        if (is_null($this->col_map) || isEmpty($this->col_map)) {
+        
+        if (is_null($this->col_map) || count($this->col_map) == 0) {
             if (isset($this->alert)) {
                 $this->alert->showAlert('Unable to initialize properties file!', 'Converter Error', 'ERROR_MESSAGE');
             }
@@ -180,12 +181,12 @@ class Table {
 
         $index = $this->col_map['AMOUNT_BILLED'];
         $data = $row[$index];
-        $amount = Converter::convertCurrency($this->checkAndTrim($data));
+        $amount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
         $claim->amountBilled = $amount;
 
         $index = $this->col_map['TITLE19_PAYMENT_MA'];
         $data = $row[$index];
-        $amount = Converter::convertCurrency($this->checkAndTrim($data));
+        $amount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
         $claim->title19Payment = $amount;
 
         $index = $this->col_map['STS'];
@@ -199,7 +200,8 @@ class Table {
         $index = $this->col_map['RECIPIENT_NAME'];
         $data = $row[$index];
         $claim->recipient = $this->checkAndTrim($data);
-
+        $claim->save();
+        
         $this->claims[] = $claim;
     }
 
@@ -229,7 +231,12 @@ class Table {
 
         $index = $this->col_map['SERVICE_DATE'];
         $data = $row[$index];
-        $sc->serviceDate = Converter::ConvertDate($this->checkAndTrim($data));
+        $sc->serviceDate = \Zoe\Lib\util\Converter::ConvertDate($this->checkAndTrim($data));
+        
+        if($sc->serviceDate == 0)
+        {
+            return;
+        }
 
         $index = $this->col_map['RENDERED_PROC'];
         $data = $row[$index];
@@ -237,11 +244,11 @@ class Table {
 
         $index = $this->col_map['AMOUNT_BILLED'];
         $data = $row[$index];
-        $sc->billedAmount = Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->billedAmount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
 
         $index = $this->col_map['TITLE19_PAYMENT_MA'];
         $data = $row[$index];
-        $sc->maPayment = Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->maPayment = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
 
         $index = $this->col_map['STS'];
         $data = $row[$index];
@@ -253,15 +260,15 @@ class Table {
 
         $index = $this->col_map['TITLE18_ALLOWED_CHARGES'];
         $data = $row[$index];
-        $sc->allowedCharges = Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->allowedCharges = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
 
         $index = $this->col_map['COPAY_AMT'];
         $data = $row[$index];
-        $sc->copayAmount = Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->copayAmount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
 
         $index = $this->col_map['TITLE_18_PAYMENT'];
         $data = $row[$index];
-        $sc->title18Payment = Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->title18Payment = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
 
         $sc = $claim->subclaims()->save($sc);
     }

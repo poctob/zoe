@@ -31,7 +31,7 @@ class Column {
      */
     public function __construct() {
         $this->width = 0;
-        $this->header = "None";
+        $this->header = '';
     }
     
     /**
