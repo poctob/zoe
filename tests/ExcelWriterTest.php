@@ -42,7 +42,7 @@ class ExcelWriterTest extends TestCase {
 
         $actual = $this->getOutput();
 
-        $this->assertNull($actual);
+        $this->assertEquals($input, $actual);
 
         $this->entity = new \Zoe\Lib\PDF2DF\ExcelWriter($this->file);
         $input = 1250.23;
@@ -80,13 +80,13 @@ class ExcelWriterTest extends TestCase {
         $this->assertNull($actual);
 
         $this->entity = new \Zoe\Lib\PDF2DF\ExcelWriter($this->file);
-        $input = mktime(0, 0, 0, 11, 26, 2015);
+        $input = new \DateTime('2015-01-01 00:00:00');
         $this->entity->addDate($input, 1, 0);
         $this->entity->writeToDisk();
 
         $actual = $this->getOutput()->timestamp;
 
-        $this->assertEquals($input, $actual);
+        $this->assertEquals($input->getTimestamp(), $actual);
     }
 
     /**

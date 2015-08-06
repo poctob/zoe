@@ -12,7 +12,7 @@ interface iExcel {
      * Adds header to the excel sheet.
      * @param string header
      */
-    public function addHeader($header);
+    public function addHeader($header, $width);
 
     /**
      * Writes file to disk.

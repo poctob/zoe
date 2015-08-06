@@ -93,7 +93,7 @@ class Parser {
                             'Converter Error', 'ERROR_MESSAGE');
                 }
             }
-            
+
             $this->ready = true;
         }
     }
@@ -109,7 +109,7 @@ class Parser {
             $tables = null;
 
             try {
-                $pdDoc = $this->parser->parseFile($this->input);                
+                $pdDoc = $this->parser->parseFile($this->input);
                 $pages = $pdDoc->getPages();
                 $title = $this->convertTitlePage($pages);
                 $numberOfPages = count($pages);
@@ -143,7 +143,7 @@ class Parser {
      * @param page String of raw text from the PDF page.
      */
     private function buildTable($page) {
-        
+
         $thead = '';
         $separator = '';
         $chead = '';
@@ -151,15 +151,15 @@ class Parser {
         $tfoot = '';
 
         $this->splitPage($page, $thead, $separator, $chead, $data, $tfoot);
-        
+
         if (!$this->headers_set) {
             $this->table->setHeader($thead);
             $this->table->setFooter($tfoot);
             $this->headers_set = true;
-            $this->buildColumns($separator, $chead);
+            $this->table->setColumns();
         }
 
-        $this->buildData($data, $this->columns);
+        $this->buildData($data, $this->table->getColumns());
     }
 
     /**
@@ -230,7 +230,7 @@ class Parser {
         } catch (Exception $ex) {
             \Log::error('Parser:buildColumns: ' . $e->getMessage());
         }
-        $this->table->setColumns($this->columns);
+        $this->table->setColumns();
     }
 
     /**
@@ -244,18 +244,20 @@ class Parser {
      */
     private function splitPage($page, &$thead, &$separator, &$chead, &$data,
             &$tfoot) {
-        
-        
+
+
         if (isset($page) && strlen($page) > 0) {
-            
+
             try {
                 $line_end = "\r\n";
-                $line = strtok($page, $line_end);                
-                
+                $line = strtok($page, $line_end);
+
                 //Extract table head first
                 while ($line !== FALSE && !$this->isHeaderSeparator($line)) {
 
-                    $thead .= $line . "\n";
+                    if (strlen(trim($line)) > 0) {
+                        $thead .= $line . "\n";
+                    }
                     $line = strtok($line_end);
                 }
 
@@ -269,7 +271,10 @@ class Parser {
 
                 //Extract column heads next
                 while ($line !== FALSE && !$this->isHeaderSeparator($line)) {
-                    $chead .= $line . "\n";
+                    if (strlen(trim($line)) > 0) {
+                        $chead .= $line . "\n";
+                    }
+
                     $line = strtok($line_end);
                 }
 
@@ -282,7 +287,10 @@ class Parser {
 
                 //Data next
                 while ($line !== FALSE && !$this->isHeaderSeparator($line)) {
-                    $data .= $line . "\n";
+                    if (strlen(trim($line)) > 0) {
+                        $data .= $line . "\n";
+                    }
+
                     $line = strtok($line_end);
                 }
 
@@ -296,7 +304,10 @@ class Parser {
 
                 //Table footer
                 while ($line !== FALSE) {
-                    $tfoot .= $line . "\n";
+                    if (strlen(trim($line)) > 0) {
+                        $tfoot .= $line . "\n";
+                    }
+
                     $line = strtok($line_end);
                 }
             } catch (Exception $ex) {
@@ -371,10 +382,9 @@ class Parser {
     public function getInput() {
         return $this->input;
     }
-    
+
     public function isReady() {
         return $this->ready;
     }
-
 
 }

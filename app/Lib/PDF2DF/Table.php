@@ -62,10 +62,11 @@ class Table {
         $this->claims = array();
         $this->col_map = config('zoe.columns');
         $this->alert = $alert;
-        
+
         if (is_null($this->col_map) || count($this->col_map) == 0) {
             if (isset($this->alert)) {
-                $this->alert->showAlert('Unable to initialize properties file!', 'Converter Error', 'ERROR_MESSAGE');
+                $this->alert->showAlert('Unable to initialize properties file!',
+                        'Converter Error', 'ERROR_MESSAGE');
             }
         }
     }
@@ -114,8 +115,16 @@ class Table {
      * Setter
      * @param array $columns
      */
-    public function setColumns($columns) {
-        $this->columns = $columns;
+    public function setColumns() {
+        foreach ($this->col_map as
+                $column) {
+            if ($column['WIDTH'] > 0) {
+                $col = new Column();
+                $col->setWidth($column['WIDTH']);
+                $col->setHeader($column['TITLE']);
+                $this->addColumn($col);
+            }
+        }
     }
 
     /**
@@ -146,9 +155,9 @@ class Table {
      */
     public function addRow($row) {
 
-        $index = $this->col_map['MAX'];
+        $index = $this->col_map['MAX']['POSITION'];
         if (isset($row) && count($row) == $index) {
-            $index = $this->col_map['RECIPIENT_ID'];
+            $index = $this->col_map['RECIPIENT_ID']['POSITION'];
             $recipientId = $row[$index];
 
             if (isset($recipientId)) {
@@ -169,39 +178,38 @@ class Table {
      * @param array Row from which the claim will be extracted.
      */
     private function addClaim($row) {
-        $claim = new \Zoe\Claim();
+        $claim = new Claim();
 
-        $index = $this->col_map['PROVIDER_REFERENCE'];
+        $index = $this->col_map['PROVIDER_REFERENCE']['POSITION'];
         $data = $row[$index];
-        $claim->providerReference = $this->checkAndTrim($data);
+        $claim->setProviderReference($this->checkAndTrim($data));
 
-        $index = $this->col_map['CLAIM_REFERENCE'];
+        $index = $this->col_map['CLAIM_REFERENCE']['POSITION'];
         $data = $row[$index];
-        $claim->claimReference = $this->checkAndTrim($data);
+        $claim->setClaimReference($this->checkAndTrim($data));
 
-        $index = $this->col_map['AMOUNT_BILLED'];
-        $data = $row[$index];
-        $amount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
-        $claim->amountBilled = $amount;
-
-        $index = $this->col_map['TITLE19_PAYMENT_MA'];
+        $index = $this->col_map['AMOUNT_BILLED']['POSITION'];
         $data = $row[$index];
         $amount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
-        $claim->title19Payment = $amount;
+        $claim->setAmountBilled($amount);
 
-        $index = $this->col_map['STS'];
+        $index = $this->col_map['TITLE19_PAYMENT_MA']['POSITION'];
         $data = $row[$index];
-        $claim->STS = $this->checkAndTrim($data);
+        $amount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
+        $claim->setTitle19Payment($amount);
 
-        $index = $this->col_map['RECIPIENT_ID'];
+        $index = $this->col_map['STS']['POSITION'];
         $data = $row[$index];
-        $claim->recipientID = $this->checkAndTrim($data);
+        $claim->setSTS($this->checkAndTrim($data));
 
-        $index = $this->col_map['RECIPIENT_NAME'];
+        $index = $this->col_map['RECIPIENT_ID']['POSITION'];
         $data = $row[$index];
-        $claim->recipient = $this->checkAndTrim($data);
-        $claim->save();
-        
+        $claim->setRecipientID($this->checkAndTrim($data));
+
+        $index = $this->col_map['RECIPIENT_NAME']['POSITION'];
+        $data = $row[$index];
+        $claim->setRecipient($this->checkAndTrim($data));
+
         $this->claims[] = $claim;
     }
 
@@ -218,59 +226,58 @@ class Table {
         }
 
         $claim = $this->claims[$claims_size - 1];
-        $sc = new \Zoe\SubClaim();
+        $sc = new SubClaim();
 
-        $index = $this->col_map['CLAIM_REFERENCE'];
+        $index = $this->col_map['CLAIM_REFERENCE']['POSITION'];
         $data = $row[$index];
 
         if (strlen($this->checkAndTrim($data)) == 0) {
             return;
         }
 
-        $sc->refNumber = $claim->claimReference . ' ' . $this->checkAndTrim($data);
+        $sc->setRefNumber($claim->getClaimReference() . ' ' . $this->checkAndTrim($data));
 
-        $index = $this->col_map['SERVICE_DATE'];
+        $index = $this->col_map['SERVICE_DATE']['POSITION'];
         $data = $row[$index];
-        $sc->serviceDate = \Zoe\Lib\util\Converter::ConvertDate($this->checkAndTrim($data));
-        
-        if($sc->serviceDate == 0)
-        {
+        $sc->setServiceDate(\Zoe\Lib\util\Converter::ConvertDate($this->checkAndTrim($data)));
+
+        if (is_null($sc->getServiceDate())) {
             return;
         }
 
-        $index = $this->col_map['RENDERED_PROC'];
+        $index = $this->col_map['RENDERED_PROC']['POSITION'];
         $data = $row[$index];
-        $sc->procedure = $this->checkAndTrim($data);
+        $sc->setProcedure($this->checkAndTrim($data));
 
-        $index = $this->col_map['AMOUNT_BILLED'];
+        $index = $this->col_map['AMOUNT_BILLED']['POSITION'];
         $data = $row[$index];
-        $sc->billedAmount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->setBilledAmount(\Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data)));
 
-        $index = $this->col_map['TITLE19_PAYMENT_MA'];
+        $index = $this->col_map['TITLE19_PAYMENT_MA']['POSITION'];
         $data = $row[$index];
-        $sc->maPayment = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->setMaPayment(\Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data)));
 
-        $index = $this->col_map['STS'];
+        $index = $this->col_map['STS']['POSITION'];
         $data = $row[$index];
-        $sc->STS = $this->checkAndTrim($data);
+        $sc->setSTS($this->checkAndTrim($data));
 
-        $index = $this->col_map['MOD'];
+        $index = $this->col_map['MOD']['POSITION'];
         $data = $row[$index];
-        $sc->MOD = $this->checkAndTrim($data);
+        $sc->setMOD($this->checkAndTrim($data));
 
-        $index = $this->col_map['TITLE18_ALLOWED_CHARGES'];
+        $index = $this->col_map['TITLE18_ALLOWED_CHARGES']['POSITION'];
         $data = $row[$index];
-        $sc->allowedCharges = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->setAllowedCharges(\Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data)));
 
-        $index = $this->col_map['COPAY_AMT'];
+        $index = $this->col_map['COPAY_AMT']['POSITION'];
         $data = $row[$index];
-        $sc->copayAmount = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->setCopayAmount(\Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data)));
 
-        $index = $this->col_map['TITLE_18_PAYMENT'];
+        $index = $this->col_map['TITLE_18_PAYMENT']['POSITION'];
         $data = $row[$index];
-        $sc->title18Payment = \Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data));
+        $sc->setTitle18Payment(\Zoe\Lib\util\Converter::convertCurrency($this->checkAndTrim($data)));
 
-        $sc = $claim->subclaims()->save($sc);
+        $claim->addSubclaim($sc);
     }
 
     /**
@@ -287,106 +294,113 @@ class Table {
     }
 
     /**
+     * Compares two Claims
+     * @param \Zoe\Lib\PDF2DF\Claim $a LHS
+     * @param \Zoe\Lib\PDF2DF\Claim $b RHS
+     * @return -1 if a is smaller than b, 0 if equal, 1 if a is larger than b
+     */
+    public function cmp(Claim $a, Claim $b) {
+        $result = strcmp($a->getLastName(), $b->getLastName());
+        if($result == 0)
+        {
+            $result = strcmp($a->getRecipientID(), $b->getRecipientID());
+        }
+        return $result;
+    }
+
+    /**
      * Exports table to excel.
      */
     public function exportToXLS() {
-        
+
         if (isset($this->xwriter)) {
-            
-            foreach ($this->columns as $c) {
-                $this->xwriter->addHeader($c->getHeader());                
+
+            usort($this->claims, array($this, "cmp"));
+
+            foreach ($this->columns as
+                    $c) {
+                $this->xwriter->addHeader($c->getHeader(), $c->getWidth() + 5);
             }
 
-            $rows = 1;
-            foreach($this->claims as $claim) {
-                
+            $rows = 2;
+            foreach ($this->claims as
+                    $claim) {
+
                 $rows += $this->exportClaim($claim, $rows);
             }
 
             $this->xwriter->writeToDisk();
         }
     }
-    
+
     /**
      * Add a claim to the excel spreadsheet.
      * @param Claim Claim to export.
      * @param int Row id.
      * @return Number of rows used by the claim.
      */
-    private function exportClaim(\Zoe\Claim $claim, $row) {
+    private function exportClaim(Claim $claim, $row) {
 
         $rows_used = 0;
         $current_row = $row;
         if (isset($this->xwriter) && isset($claim)) {
 
-            foreach ($claim->subclaims() as $sc) {
+            foreach ($claim->getSubclaims() as
+                    $sc) {
                 if (isset($sc)) {
-                    
+
                     $this->xwriter->addString(
-                            $claim->providerReference,
-                            $current_row,
-                            $this->col_map['PROVIDER_REFERENCE']);
-                    
+                            $claim->getProviderReference(), $current_row,
+                            $this->col_map['PROVIDER_REFERENCE']['POSITION']);
+
                     $this->xwriter->addString(
-                            $sc->refNumber,
-                            $current_row,
-                            $this->col_map['CLAIM_REFERENCE']);
+                            $sc->getRefNumber(), $current_row,
+                            $this->col_map['CLAIM_REFERENCE']['POSITION']);
 
                     $this->xwriter->addDate(
-                            $sc->serviceDate,
-                            $current_row,
-                            $this->col_map['SERVICE_DATE']);
+                            $sc->getServiceDate(), $current_row,
+                            $this->col_map['SERVICE_DATE']['POSITION']);
 
                     $this->xwriter->addString(
-                            $sc->procedure,
-                            $current_row,
-                            $this->col_map['RENDERED_PROC']);
+                            $sc->getProcedure(), $current_row,
+                            $this->col_map['RENDERED_PROC']['POSITION']);
 
                     $this->xwriter->addCurrency(
-                            $sc->billedAmount,
-                            $current_row,
-                            $this->col_map['AMOUNT_BILLED']);
-                    
-                    $this->xwriter->addCurrency(
-                            $sc->maPayment,
-                            $current_row,
-                            $this->col_map['TITLE19_PAYMENT_MA']);
-                    
-                    $this->xwriter->addString(
-                            $sc->STS,
-                            $current_row,
-                            $this->col_map['STS']);
-                    
-                    $this->xwriter->addString(
-                            $claim->recipientID,
-                            $current_row,
-                            $this->col_map['RECIPIENT_ID']);
-
-                    $this->xwriter->addString(
-                            $claim->recipient,
-                            $current_row,
-                            $this->col_map['RECIPIENT_NAME']);
-                    
-                    $this->xwriter->addString(
-                            $sc->MOD,
-                            $current_row,
-                            $this->col_map['MOD']);
+                            $sc->getBilledAmount(), $current_row,
+                            $this->col_map['AMOUNT_BILLED']['POSITION']);
 
                     $this->xwriter->addCurrency(
-                            $sc->allowedCharges,
-                            $current_row,
-                            $this->col_map['TITLE18_ALLOWED_CHARGES']);
-                    
+                            $sc->getMaPayment(), $current_row,
+                            $this->col_map['TITLE19_PAYMENT_MA']['POSITION']);
+
+                    $this->xwriter->addString(
+                            $sc->getSTS(), $current_row,
+                            $this->col_map['STS']['POSITION']);
+
+                    $this->xwriter->addString(
+                            $claim->getRecipientID(), $current_row,
+                            $this->col_map['RECIPIENT_ID']['POSITION']);
+
+                    $this->xwriter->addString(
+                            $claim->getRecipient(), $current_row,
+                            $this->col_map['RECIPIENT_NAME']['POSITION']);
+
+                    $this->xwriter->addString(
+                            $sc->getMOD(), $current_row,
+                            $this->col_map['MOD']['POSITION']);
+
                     $this->xwriter->addCurrency(
-                            $sc->copayAmount,
-                            $current_row,
-                            $this->col_map['COPAY_AMT']);
-                    
+                            $sc->getAllowedCharges(), $current_row,
+                            $this->col_map['TITLE18_ALLOWED_CHARGES']['POSITION']);
+
                     $this->xwriter->addCurrency(
-                            $sc->title18Payment,
-                            $current_row,
-                            $this->col_map['TITLE_18_PAYMENT']);
-                    
+                            $sc->getCopayAmount(), $current_row,
+                            $this->col_map['COPAY_AMT']['POSITION']);
+
+                    $this->xwriter->addCurrency(
+                            $sc->getTitle18Payment(), $current_row,
+                            $this->col_map['TITLE_18_PAYMENT']['POSITION']);
+
                     $rows_used++;
                     $current_row++;
                 }

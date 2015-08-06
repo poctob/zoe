@@ -21,7 +21,7 @@ class ConverterTest extends TestCase {
         $this->assertEquals($expected, $actual);     
         
         $input = 'junk';
-        $expected = 0;
+        $expected = NULL;
         $actual = \Zoe\Lib\util\Converter::convertCurrency($input);
         $this->assertEquals($expected, $actual); 
     }
@@ -38,7 +38,7 @@ class ConverterTest extends TestCase {
         $this->assertEquals($expected, $actual);
         
         $input = 'junk';
-        $expected = '0';
+        $expected = NULL;
         $actual = \Zoe\Lib\util\Converter::convertDate($input);
         $this->assertEquals($expected, $actual);
     }

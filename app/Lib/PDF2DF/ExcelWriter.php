@@ -73,7 +73,7 @@ class ExcelWriter implements iExcel {
      * @param int $col
      */
     public function addCurrency($data, $row, $col) {
-        if ($this->initialized && isset($data) && $data > 0) {
+        if ($this->initialized && isset($data)) {
 
             if (isset($this->workbook)) {
                 $this->workbook
@@ -98,7 +98,7 @@ class ExcelWriter implements iExcel {
      * @param int $col
      */
     public function addDate($data, $row, $col) {
-        if ($this->initialized && isset($data) && $data > 0) {
+        if ($this->initialized && isset($data) && $data instanceof \DateTime) {
 
             if (isset($this->workbook)) {
                 $this->workbook
@@ -120,7 +120,7 @@ class ExcelWriter implements iExcel {
      * Adds header to column
      * @param string $header
      */
-    public function addHeader($header) {
+    public function addHeader($header, $width) {
         if ($this->initialized && isset($header) && strlen($header) > 0) {
 
             if (isset($this->workbook)) {
@@ -139,6 +139,11 @@ class ExcelWriter implements iExcel {
                         ->getCellByColumnAndRow(count($this->headers) - 1, 1)
                         ->getStyle()
                         ->applyFromArray($styleArray);
+                
+                $col_index = 65 + count($this->headers) - 1;
+                 $this->workbook
+                        ->getSheet()
+                        ->setwidth(chr($col_index), $width);                
             }
         }
     }
