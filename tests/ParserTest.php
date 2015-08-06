@@ -7,7 +7,7 @@ class ParserTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        $this->input = "unittestin.pdf";
+        $this->input = "tests/files/unittestin.pdf";
         $this->entity = new \Zoe\Lib\PDF2DF\Parser($this->input, 'unittestout',
                 new Zoe\Lib\PDF2DF\Alert(), new \Zoe\Lib\PDF2DF\Progress());
     }
@@ -22,11 +22,30 @@ class ParserTest extends TestCase {
     }
 
     public function testConvert() {
-        $seeder = new DatabaseSeeder();
-        $seeder->run();
-        
         $this->entity->convert();
         $this->assertTrue(file_exists('storage/exports/unittestout.xls'));
+    }
+
+    public function testIsValid() {
+        $this->assertTrue($this->entity->isFileValid());
+
+        $entity = new \Zoe\Lib\PDF2DF\Parser("tests/files/dummy.pdf",
+                'unittestout', new Zoe\Lib\PDF2DF\Alert(),
+                new \Zoe\Lib\PDF2DF\Progress());
+
+        $this->assertFalse($entity->isFileValid());
+
+        $entity = new \Zoe\Lib\PDF2DF\Parser("tests/files/onepage.pdf",
+                'unittestout', new Zoe\Lib\PDF2DF\Alert(),
+                new \Zoe\Lib\PDF2DF\Progress());
+
+        $this->assertFalse($entity->isFileValid());
+
+        $entity = new \Zoe\Lib\PDF2DF\Parser("tests/files/dummytest.txt",
+                'unittestout', new Zoe\Lib\PDF2DF\Alert(),
+                new \Zoe\Lib\PDF2DF\Progress());
+
+        $this->assertFalse($entity->isFileValid());
     }
 
     /**

@@ -175,6 +175,10 @@ class Claim {
         return false;
     }
 
+    /**
+     * Extracts last name from the recipient field.
+     * @return string
+     */
     public function getLastName() {
         $location = strrpos($this->recipient, ' ');
         $lastname = substr($this->recipient, $location + 1);

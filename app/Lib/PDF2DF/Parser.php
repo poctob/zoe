@@ -76,7 +76,7 @@ class Parser {
                 $this->parser = new \Smalot\PdfParser\Parser();
                 $this->table = new Table(new ExcelWriter($output), $this->alert);
                 $this->columns = array();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Log::error('Parser:__construct: ' . $e->getMessage());
                 $this->ready = false;
                 if (isset($this->alert)) {
@@ -96,6 +96,30 @@ class Parser {
 
             $this->ready = true;
         }
+    }
+
+    /**
+     * Some rudimentary checks for file validity.
+     * @return True if file is valid, false otherwise.
+     */
+    public function isFileValid() {
+        $isvalid = file_exists($this->input);
+        if ($isvalid) {
+            try {
+                $pdDoc = $this->parser->parseFile($this->input);
+                $pages = $pdDoc->getPages();
+                $isvalid = count($pages) > 1;
+            } catch (\Exception $e) {
+                $isvalid = false;
+                \Log::error('Parser:__construct: ' . $e->getMessage());
+                $this->ready = false;
+                if (isset($this->alert)) {
+                    $this->alert->showAlert('Unable to initialize input file!' . $e->getMessage(),
+                            'Converter Error', 'ERROR_MESSAGE');
+                }
+            }
+        }
+        return $isvalid;
     }
 
     /**
@@ -130,7 +154,7 @@ class Parser {
 
                 $this->table->exportToXLS();
                 return true;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Log::error('Parser:convert: ' . $e->getMessage());
                 return false;
             }
@@ -189,7 +213,7 @@ class Parser {
                 }
                 $line = strtok($separator);
             }
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             \Log::error('Parser:buildData: ' . $e->getMessage());
         }
     }
@@ -227,7 +251,7 @@ class Parser {
                 }
                 $line = strtok($line_sep);
             }
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             \Log::error('Parser:buildColumns: ' . $e->getMessage());
         }
         $this->table->setColumns();
@@ -310,7 +334,7 @@ class Parser {
 
                     $line = strtok($line_end);
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 \Log::error('Parser:splitPage: ' . $e->getMessage());
             }
         }
@@ -353,7 +377,7 @@ class Parser {
         if (isset($doc) && count($doc) >= $page) {
             try {
                 return $doc[$page]->getText();
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 \Log::error('Parser:extractTables: ' . $e->getMessage());
             }
         }
@@ -368,7 +392,7 @@ class Parser {
     private function convertTitlePage($doc) {
         try {
             return $doc[self::TITLE_PAGE]->getText();
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             \Log::error('Parser:convertTitlePage: ' . $e->getMessage());
         }
 
