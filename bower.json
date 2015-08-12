@@ -1,0 +1,11 @@
+{
+  "name": "Zoe",
+  "description": "PDF Converter",
+  "license": "GPL",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "~3.3.2",
+    "bootstrap-select": "~1.6.4",
+    "font-awesome": "~4.3.0"
+  }
+}
