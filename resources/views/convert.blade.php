@@ -6,6 +6,8 @@
 
         {!! Html::script('js/vendor.js') !!}
         {!! Html::style('css/dropzone.css') !!}
+        {!! Html::style('css/dz.css') !!}
+        {!! Html::script('js/app.js') !!}
 
 
     </head>
@@ -17,22 +19,10 @@
 
                 <hr/>
                 <div>
-                {!! Form::open(['url'=>'convert_file', 'class'=>'dropzone', 'name'=> 'dropzoneForm']) !!}
-                {!! Form::close() !!}
+                    {!! Form::open(['url'=>'convert_file', 'id'=>'uploadForm', 'class'=>'dropzone', 'name'=> 'dropzoneForm', 'files'=>true]) !!}
+                    {!! Form::close() !!}
                 </div>
-                <hr/>               
+                <hr/>  
 
-                <h3>Progress</h3>
-                <div class="progress">
-
-                    <div class="progress-bar" 
-                         role="progressbar" 
-                         aria-valuenow="0" 
-                         aria-valuemin="0" 
-                         aria-valuemax="0" style="width: 0%;">
-                        Progress: 0%
-                    </div>
-                </div>
-            </div>
-    </body>
-</html>
+                </body>
+                </html>

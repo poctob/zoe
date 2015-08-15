@@ -1,7 +1,13 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+$(function () {
+    Dropzone.options.uploadForm = {
+        init: function () {
+            this.on("success", function (file, responseText) {
+                // Handle the responseText here. For example, 
+                // add the text to the preview element:
+                window.location.href = responseText.download_url;
+            });
 
+        }
+    };
 
+});

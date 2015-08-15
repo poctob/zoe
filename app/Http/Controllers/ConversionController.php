@@ -47,19 +47,35 @@ class ConversionController extends Controller implements iProgress, iAlert {
      * @return Response
      */
     public function convert(Request $request) {
-        $file = $request->file('inputFile');
+        $file = $request->file('file');
         if (isset($file) && $file->isValid()) {
-            $ts = time();
-            $fname = $file->getClientOriginalName();
-            $file->move('/', $ts . 'pdf');
-            $parser = new Parser($ts . 'pdf', $fname, $this, $this);
 
-            if ($parser->isFileValid()) {
-                $parser->convert();
-                return response()->download('storage/exports/' . $fname . '.xls');
+            try {
+                $ts = time();
+                $fname = $file->getClientOriginalName();
+                $newfilename = $ts . '.pdf';
+                $newdir = '../storage/exports/';
+                $file->move($newdir, $newfilename);
+                $parser = new Parser($newdir . $newfilename, $fname, $this,
+                        $this);
+
+                if ($parser->isFileValid()) {
+                    $parser->convert();
+                    $converted_file = $newdir . $fname . '.xls';
+                    $download_link = './' . $fname . '.xls';
+                    
+                    rename($converted_file, $download_link);
+                    unlink($newdir . $newfilename);
+                    return response()->json(['download_url' => $fname . '.xls']);
+                } else {
+                    return response()->json(['error' => 'File conversion error!'],
+                                    415);
+                }
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 500);
             }
         }
-        return response()->json(['error' => 'File conversion error!']);
+        return response()->json(['error' => 'Invalid or Empty File!'], 415);
     }
 
     public function setCurrent($current) {
