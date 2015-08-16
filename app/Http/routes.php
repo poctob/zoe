@@ -17,6 +17,7 @@ Route::get('home', 'HomeController@index');
 
 Route::post('convert_file', 'ConversionController@convert');
 Route::get('convert', 'ConversionController@index');
+Route::get('download/{filename}', 'ConversionController@downloadFile');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
