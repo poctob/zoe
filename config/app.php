@@ -145,7 +145,8 @@ return [
 		'Zoe\Providers\ConfigServiceProvider',
 		'Zoe\Providers\EventServiceProvider',
 		'Zoe\Providers\RouteServiceProvider',
-                'Maatwebsite\Excel\ExcelServiceProvider'
+                'Maatwebsite\Excel\ExcelServiceProvider',
+                'Laravel\Cashier\CashierServiceProvider'
 
 	],
 

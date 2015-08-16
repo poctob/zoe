@@ -28,7 +28,7 @@ class ConversionController extends Controller implements iProgress, iAlert {
      * @return void
      */
     public function __construct() {
-        $this->middleware('guest');
+        $this->middleware('auth');
         $this->progress = 0;
         $this->progress_max = 100;
         $this->files = array();

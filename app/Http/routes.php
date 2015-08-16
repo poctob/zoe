@@ -15,8 +15,23 @@ Route::get('/', 'WelcomeController@index');
 
 Route::get('home', 'HomeController@index');
 
+/*Route::post('convert_file', [
+    'middleware' => 'auth',
+    'uses' =>'ConversionController@convert'
+]);
+
+Route::get('convert', [
+    'middleware' => 'auth',
+    'uses' =>'ConversionController@index'
+]);
+
+Route::get('download/{filename}', [
+    'middleware' => 'auth',
+    'uses' =>'ConversionController@downloadFile'
+]);*/
+
 Route::post('convert_file', 'ConversionController@convert');
-Route::get('convert', 'ConversionController@index');
+Route::get('convert', 'ConversionController@index',['middleware' => 'auth']);
 Route::get('download/{filename}', 'ConversionController@downloadFile');
 
 Route::controllers([
