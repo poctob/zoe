@@ -31,8 +31,14 @@ Route::get('download/{filename}', [
 ]);*/
 
 Route::post('convert_file', 'ConversionController@convert');
-Route::get('convert', 'ConversionController@index',['middleware' => 'auth']);
+Route::get('convert', 'ConversionController@index');
 Route::get('download/{filename}', 'ConversionController@downloadFile');
+
+Route::get('subscribe', 'SubscriptionController@index');
+Route::post('subscribe', 'SubscriptionController@subscribe');
+
+Route::get('profile', 'ProfileController@index');
+Route::post('profile', 'ProfileController@update');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',

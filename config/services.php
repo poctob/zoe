@@ -15,8 +15,8 @@ return [
 	*/
 
 	'mailgun' => [
-		'domain' => '',
-		'secret' => '',
+		'domain' => 'mg.xpresstek.net',
+		'secret' => 'key-fad44e581c0a8db97dc6babb41e3fa6c',
 	],
 
 	'mandrill' => [
