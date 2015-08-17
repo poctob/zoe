@@ -35,6 +35,7 @@ Route::get('convert', 'ConversionController@index');
 Route::get('download/{filename}', 'ConversionController@downloadFile');
 
 Route::get('subscribe', 'SubscriptionController@index');
+Route::get('subscriptions', 'SubscriptionController@show');
 Route::post('subscribe', 'SubscriptionController@subscribe');
 
 Route::get('profile', 'ProfileController@index');

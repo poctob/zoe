@@ -48,5 +48,32 @@ class SubscriptionController extends Controller {
             }
         }
     }
+    
+    public function show(Request $request)
+    {
+        if ($request->user())
+        {
+            $subscription = null;
+            if($request->user()->subscribed())
+            {
+                $user = $request->user();      
+                $subscription = array();
+                $subscription['plan'] = $user->getStripePlan();
+                $subscription['is_trial'] = $user->onTrial();
+                $subscription['trial_end'] = $user->getTrialEndDate();
+                $subscription['expired'] = $user->expired();
+                $subscription['subscription_end'] = $user->getSubscriptionEndDate();
+                $subscription['last_four'] = $user->getLastFourCardDigits();
+                
+                 return view('subscription',
+                        ['subscription' => $subscription]);
+            }
+            else
+            {
+                 return view('subscription',
+                        ['error' => 'You have no active subscriptions.']);
+            }
+        }
+    }
 
 }

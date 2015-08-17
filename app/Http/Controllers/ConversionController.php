@@ -39,8 +39,16 @@ class ConversionController extends Controller implements iProgress, iAlert {
      *
      * @return Response
      */
-    public function index() {
-        return view('convert');
+    public function index(Request $request) {
+        if ($request->user()) {
+            if ($request->user()->subscribed()) {
+                return view('convert');
+            }
+            else
+            {
+                return view('subscribe');
+            }
+        }
     }
 
     /**
@@ -55,35 +63,36 @@ class ConversionController extends Controller implements iProgress, iAlert {
             try {
 
                 $fname = $file->getClientOriginalName();
-                
+
                 /**
                  * We need to generate a unique file name here is case of
                  * a concurrent access with the same file name.  Not a likely
                  * scenario, but better safe than sorry.
-                 */                
+                 */
                 $newfilename = hash('md5', $fname);
-                
+
                 /**
                  * Move the source file out of the public directory.
                  */
                 $newdir = '../storage/exports/';
                 $file->move($newdir, $newfilename);
-                
-                $parser = new Parser($newdir . $newfilename, $newfilename, $this,
-                        $this);
+
+                $parser = new Parser($newdir . $newfilename, $newfilename,
+                        $this, $this);
 
                 if ($parser->isFileValid()) {
                     $parser->convert();
-                    
+
                     /**
                      * Delete source file.
                      */
                     unlink($newdir . $newfilename);
-                    
+
                     /**
                      * Push converted file information to the session.
                      */
-                    $this->storeFileName($request, $newfilename . '.xls', $fname.'.xls');
+                    $this->storeFileName($request, $newfilename . '.xls',
+                            $fname . '.xls');
 
                     /**
                      * Let the user know that we are done.
@@ -108,30 +117,29 @@ class ConversionController extends Controller implements iProgress, iAlert {
      */
     public function downloadFile(Request $request, $filename) {
         if (isset($filename) && strlen($filename) > 0 && $request->session()->has('convertedFiles')) {
-            
+
             /**
              * Get file info from the session.
              */
             $files = $request->session()->get('convertedFiles');
-            
+
             /**
              * Double check to make sure that this is the file we are looking for.
              */
-                if ($files['name'] == $filename) {
-                
-                    /**
-                     * We are only letting user know the file name, so we need
-                     * build the path here.
-                     */
-                    $fname = '../storage/exports/'.$filename;
-                                        
-                    if (file_exists($fname)) {
-                        return response()->download($fname, $files['original_name']);
-                    } else {
-                        return response()->json(['error' => 'Invalid file requests!'],
-                                        415);
-                    }
-                
+            if ($files['name'] == $filename) {
+
+                /**
+                 * We are only letting user know the file name, so we need
+                 * build the path here.
+                 */
+                $fname = '../storage/exports/' . $filename;
+
+                if (file_exists($fname)) {
+                    return response()->download($fname, $files['original_name']);
+                } else {
+                    return response()->json(['error' => 'Invalid file requests!'],
+                                    415);
+                }
             }
         } else {
             return response()->json(['error' => 'Invalid hash parameter!'], 415);
@@ -154,7 +162,7 @@ class ConversionController extends Controller implements iProgress, iAlert {
             if ($request->session()->has('convertedFiles')) {
                 $request->session()->forget('convertedFiles');
             }
-            
+
             $request->session()->put('convertedFiles', $files);
         }
     }
