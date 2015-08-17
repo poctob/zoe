@@ -4,9 +4,12 @@ $(function () {
     handler = StripeCheckout.configure({
         key: 'pk_test_KioaeTnYy64CfKnL0a5kaoxB',
         image: './images/checkout-icon.gif',
+        zipCode: true,
+        address: true,
         token: function (token) {
             var csrf=$("[name='_token']").val();
             $.post( "subscribe", { token: token.id, _token: csrf} );
+            window.location.href = '/applications';
         }
     });
 

@@ -41,6 +41,8 @@ Route::post('subscribe', 'SubscriptionController@subscribe');
 Route::get('profile', 'ProfileController@index');
 Route::post('profile', 'ProfileController@update');
 
+Route::get('applications', 'ApplicationsController@index');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

@@ -4,6 +4,12 @@
 {!! Html::style('css/profile.css') !!}
 {!! Html::script('js/validator.js') !!}
 <div class="profile-page">
+    <ul class="nav nav-pills">
+        <li role="presentation"><a href="applications">Applications</a></li>
+        <li role="presentation"><a href="subscriptions">Subscriptions</a></li>
+        <li role="presentation" class="active"><a href="#">Profile</a></li>              
+    </ul>
+    
     @if (isset($success))
     <div class="alert alert-success" role="alert">{{ $success }}</div>
     @elseif (isset($error))
@@ -38,7 +44,7 @@
                     'data-error'=> 'Email address is invalid']) !!}
                     <div class="help-block with-errors"></div>
                 </div>
-                
+
             </div>
 
             <div class="form-group">
@@ -49,6 +55,7 @@
 
 
             {!! Form::close() !!}
+
 
 
         </div>
