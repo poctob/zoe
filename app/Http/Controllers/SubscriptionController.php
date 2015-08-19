@@ -4,6 +4,10 @@ namespace Zoe\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Zoe\Trial;
+use Zoe\Application;
+use Zoe\TrialType;
+use Carbon\Carbon;
 
 class SubscriptionController extends Controller {
     /*
@@ -59,14 +63,14 @@ class SubscriptionController extends Controller {
                 $user = $request->user();      
                 $subscription = array();
                 $subscription['plan'] = $user->getStripePlan();
-                $subscription['is_trial'] = $user->onTrial();
-                $subscription['trial_end'] = $user->getTrialEndDate();
                 $subscription['expired'] = $user->expired();
                 $subscription['subscription_end'] = $user->getSubscriptionEndDate();
                 $subscription['last_four'] = $user->getLastFourCardDigits();
                 
+                $trials = $this->getTrials($request->user());
+                
                  return view('subscription',
-                        ['subscription' => $subscription]);
+                        ['subscription' => $subscription, 'trials' => $trials]);
             }
             else
             {
@@ -74,6 +78,25 @@ class SubscriptionController extends Controller {
                         ['error' => 'You have no active subscriptions.']);
             }
         }
+    }
+    
+    private function getTrials($user)
+    {
+        $trials = $user->trials;
+        $all_trials = array();
+        
+        foreach($trials as $trial)
+        {
+            $t = array();
+            $t['plan'] = $trial->application->name.' - '.$trial->trialType->name;
+            $t['is_trial'] = true;
+            $t['trial_end'] = $trial->expires;
+            $t['expired'] = $trial->expires > 0 && $trial->expires < Carbon::now();
+            
+            $all_trials[] = $t;
+        }
+        
+        return $all_trials;
     }
 
 }

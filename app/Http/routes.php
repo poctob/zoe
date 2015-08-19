@@ -43,6 +43,8 @@ Route::post('profile', 'ProfileController@update');
 
 Route::get('applications', 'ApplicationsController@index');
 
+Route::post('trial', 'TrialController@create');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

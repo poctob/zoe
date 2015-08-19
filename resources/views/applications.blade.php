@@ -1,8 +1,8 @@
-@extends('app')
+@extends('head')
 
-@section('content')
-{!! Html::style('css/profile.css') !!}
-<div class="profile-page">
+@section('morecontent')
+
+    
     <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="#">Applications</a></li>
         <li role="presentation"><a href="subscriptions">Subscriptions</a></li>    
@@ -20,10 +20,20 @@
             @else
             <div class="well well-sm">
                 <a href="{{ url('/convert') }}" class="glyphicon glyphicon-cloud-download"> SC Medicaid Converter</a>
+
+                {!! Form::open(['url'=>'trial', 
+                'id'=>'trialForm']) !!}
+
+                {!! Form::hidden('application', 'SC Medicaid Converter') !!}
+                {!! Form::hidden('type', 'Standard 14 weeks') !!}
+
+                {!! Form::submit('Start Your 14 Day Trial', ['type'=>'button', 'class'=>'btn btn-primary']) !!}
+
+                {!! Form::close() !!}
+
             </div>
             @endif
         </div>
     </div>
-</div>
 
 @endsection

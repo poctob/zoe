@@ -1,9 +1,8 @@
-@extends('app')
+@extends('head')
 
-@section('content')
-{!! Html::style('css/profile.css') !!}
+@section('morecontent')
 {!! Html::script('js/validator.js') !!}
-<div class="profile-page">
+
     <ul class="nav nav-pills">
         <li role="presentation"><a href="applications">Applications</a></li>
         <li role="presentation"><a href="subscriptions">Subscriptions</a></li>
@@ -60,6 +59,5 @@
 
         </div>
     </div>
-</div>
 
 @endsection

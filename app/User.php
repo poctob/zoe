@@ -1,4 +1,6 @@
-<?php namespace Zoe;
+<?php
+
+namespace Zoe;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
@@ -8,31 +10,39 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Contracts\Billable as BillableContract;
 
-class User extends Model implements AuthenticatableContract, CanResetPasswordContract,BillableContract {
+class User extends Model implements AuthenticatableContract, CanResetPasswordContract, BillableContract {
 
-	use Authenticatable, CanResetPassword, Billable;
+    use Authenticatable,
+        CanResetPassword,
+        Billable;
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'users';
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
 
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array
-	 */
-	protected $fillable = ['name', 'email', 'password'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['name', 'email', 'password'];
 
-	/**
-	 * The attributes excluded from the model's JSON form.
-	 *
-	 * @var array
-	 */
-	protected $hidden = ['password', 'remember_token'];
-        
-        protected $dates = ['trial_ends_at', 'subscription_ends_at'];
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = ['password', 'remember_token'];
+    protected $dates = ['trial_ends_at', 'subscription_ends_at'];
+
+    /**
+     * Get the trials for the user
+     */
+    public function trials() {
+        return $this->hasMany('Zoe\Trial');
+    }
 
 }
