@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Zoe\Application;
 use Carbon\Carbon;
+use Cache;
 
 class SubscriptionController extends Controller {
     /*
@@ -39,6 +40,7 @@ class SubscriptionController extends Controller {
         if ($request->user() && $request->has('token')) {
 
             try {
+                Cache::forget('user_apps_'.$request->user()->id); 
                 $request->user()->subscription('SCConverter')->create($request->input('token'));
                 return response()->json(['success' => 'Thank You! '
                             . 'Your payment has been accepted!']);

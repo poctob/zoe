@@ -8,6 +8,7 @@ use Zoe\Application;
 use Zoe\TrialType;
 use Zoe\Trial;
 use \Carbon\Carbon;
+use Cache;
 
 class TrialController extends Controller {
     /*
@@ -52,7 +53,7 @@ class TrialController extends Controller {
                             $trial_type);
                     $trial->save();
                     
-                    
+                    Cache::forget('user_apps_'.$request->user()->id);
                     \Session::flash('growl', ['type' => 'success', 'message' => 'Trial created successfully!']);
                     return redirect('applications');
                                         
