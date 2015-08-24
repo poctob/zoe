@@ -15,6 +15,7 @@ class CreateApplicationsTable extends Migration {
                 function(Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('url')->default('/');
             $table->timestamps();
         });
     }

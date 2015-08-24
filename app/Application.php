@@ -10,7 +10,11 @@ class Application extends Model {
      * Get the trials for the user
      */
     public function trials() {
-        return $this->hasMany('Trial');
+        return $this->hasMany('Zoe\Trial');
+    }
+    
+     public function trialTypesToApplications() {
+        return $this->hasMany('Zoe\TrialTypesToApplication');
     }
 
 }

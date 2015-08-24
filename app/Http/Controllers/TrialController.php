@@ -159,7 +159,7 @@ class TrialController extends Controller {
         $trial = Trial::where(['user_id' => $user_id, 'application_id' => $application_id,
                     'trial_type_id' => $trial_type_id]);
 
-        return $trial != null;
+        return $trial->exists();
     }
 
 }

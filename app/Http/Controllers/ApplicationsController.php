@@ -4,6 +4,7 @@ namespace Zoe\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Zoe\Application;
 
 class ApplicationsController extends Controller {
     /*
@@ -32,12 +33,43 @@ class ApplicationsController extends Controller {
     public function index(Request $request) {
         if ($request->user() && $request->user()->subscribed()) {
                      
-            return view('applications');
+            $apps = $this->getUserApplications($request->user());
+            
+            if(count($apps) == 0)
+            {
+                \Session::flash('growl', ['type' => 'danger', 'message' => 'You have no active applications!']);
+            }
+            return view('applications',
+                ['apps' => $apps]);
         }
-        else
+    }
+    
+    private function getUserApplications($user)
+    {
+        $trials = $user->trials;
+        $apps = array();
+        $applications = Application::all();
+        
+        foreach($applications as $a)
         {
-            return view('applications',['error' => 'You have no active applications.']);
+            if($user->onPlan($a->name))
+            {
+                $apps[] = $a;
+            }
         }
+
+        foreach ($trials as
+                $trial) {
+         
+            $expired = $trial->expires > 0 && $trial->expires < Carbon::now();
+            
+            if(!$expired && !in_array($trial->application, $apps))
+            {
+                $apps[] = $trial->application;
+            }
+        }
+
+        return $apps;
     }
 
    
