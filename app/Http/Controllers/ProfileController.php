@@ -31,7 +31,7 @@ class ProfileController extends Controller {
      */
     public function index(Request $request) {
         if ($request->user()) {
-            $fuser = $this->getFillable($request->user());           
+            $fuser = $request->user()->getFillableFields();           
             return view('profile', ['user' => $fuser]);
         }
     }
@@ -54,7 +54,7 @@ class ProfileController extends Controller {
                 }
 
                 $request->user()->push();
-                $fuser = $this->getFillable($request->user());
+                $fuser = $request->user()->getFillableFields();
                 return view('profile',
                         ['user' => $fuser, 'success' => 'Thank You! '
                     . 'Your profile has been updated!']);
@@ -63,19 +63,6 @@ class ProfileController extends Controller {
                         ['user' => $fuser, 'error' => $e->getMessage()]);
             }
         }
-    }
-
-    private function getFillable($user) {
-        if (isset($user)) {
-            $fuser = array();
-            foreach ($user->getFillable() as
-                    $f) {
-                if ($f != 'password') {
-                    $fuser[$f] = $user->$f;
-                }
-            }
-            return $fuser;
-        }
-    }
+    }    
 
 }

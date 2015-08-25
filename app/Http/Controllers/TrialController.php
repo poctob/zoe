@@ -7,7 +7,6 @@ use Illuminate\Http\Response;
 use Zoe\Application;
 use Zoe\TrialType;
 use Zoe\Trial;
-use \Carbon\Carbon;
 use Cache;
 
 class TrialController extends Controller {
@@ -49,11 +48,16 @@ class TrialController extends Controller {
                 }
 
                 try {
-                    $trial = $this->makeTrial($request->user(), $application,
+                    $trial = Trial::makeTrial(
+                            $request->user(), 
+                            $application,
                             $trial_type);
+                    
                     $trial->save();
                     
+                    //Clear available apps cache
                     Cache::forget('user_apps_'.$request->user()->id);
+                    
                     \Session::flash('growl', ['type' => 'success', 'message' => 'Trial created successfully!']);
                     return redirect('applications');
                                         
@@ -77,7 +81,7 @@ class TrialController extends Controller {
     private function getApplication(Request $request) {
         if ($request->has('application')) {
             $app = $request->get('application');
-            return $this->getApplicatonByName($app);
+            return Application::getByName($app);
         } else {
             return null;
         }
@@ -91,7 +95,7 @@ class TrialController extends Controller {
     private function getTrialType(Request $request) {
         if ($request->has('type')) {
             $type = $request->get('type');
-            return $this->getTrialTypeByName($type);
+            return TrialType::getByName($type);
         } else {
             return null;
         }
@@ -105,62 +109,6 @@ class TrialController extends Controller {
      * @return type
      */
     private function checkTrial($user, $application, $trial_type) {
-        return $this->trialExists($user->id, $application->id, $trial_type->id);
+        return Trial::exists($user->id, $application->id, $trial_type->id);
     }
-
-    /**
-     * Makes new Trial object.
-     * @param User $user
-     * @param Application $application
-     * @param TrialType $trial_type
-     * @return Trial
-     */
-    private function makeTrial($user, $application, $trial_type) {
-        $trial = new Trial();
-        $trial->application_id = $application->id;
-        $trial->user_id = $user->id;
-        $trial->trial_type_id = $trial_type->id;
-
-        $now = Carbon::now();
-        $length = $trial_type->length;
-
-        if ($length > 0) {
-            $trial->expires = $now->addDays($length);
-        }
-
-        return $trial;
-    }
-
-    /**
-     * Utility to get application based on its name.
-     * @param string $name
-     * @return Zoe\Application
-     */
-    private function getApplicatonByName($name) {
-        return Application::where('name', $name)->first();
-    }
-
-    /**
-     * Utility to get trial type by name
-     * @param string $name
-     * @return Zoe\TrialType
-     */
-    private function getTrialTypeByName($name) {
-        return TrialType::where('name', $name)->first();
-    }
-
-    /**
-     * Checks if trial already exists for specified type and application.
-     * @param int $user_id
-     * @param int $application_id
-     * @param int $trial_type_id
-     * @return boolean
-     */
-    private function trialExists($user_id, $application_id, $trial_type_id) {
-        $trial = Trial::where(['user_id' => $user_id, 'application_id' => $application_id,
-                    'trial_type_id' => $trial_type_id]);
-
-        return $trial->exists();
-    }
-
 }

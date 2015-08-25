@@ -1,14 +1,22 @@
-@extends('app')
+@extends('head')
 
-@section('content')
+@section('morecontent')
+
 {!! Html::style('css/dropzone.css') !!}
 {!! Html::script('js/app.js') !!}
-{!! Html::style('css/profile.css') !!}
-<div class="profile-page">
-    <span><h1>SC Medicare Converter</h1></span>
-    <span><h2>Upload your file below:</h2></span>
 
-    <hr/>
+<ul class="nav nav-pills">
+    <li role="presentation" class="active"><a href="#">Applications</a></li>
+    <li role="presentation"><a href="subscriptions">Subscriptions</a></li>    
+    <li role="presentation"><a href="profile">Profile</a></li>
+</ul>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">SC Medicaid Converter</h3>
+        <span>Upload your file below:</span>
+    </div>
     <div class="panel-body">
         {!! Form::open(['url'=>'convert_file', 
         'id'=>'uploadForm', 
@@ -16,6 +24,5 @@
         'name'=> 'dropzoneForm', 'files'=>true]) !!}
         {!! Form::close() !!}
     </div>
-    <hr/>  
 </div>
 @endsection

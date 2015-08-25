@@ -41,8 +41,94 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     /**
      * Get the trials for the user
      */
-    public function trials() {
-        return $this->hasMany('Zoe\Trial');
+    public function trial() {
+        return $this->hasOne('Zoe\Trial');
+    }
+
+    /**
+     * Checks if user has subscription to specified app
+     * @param string $app Application name.
+     * @return boolean True if user has access, false otherwise.
+     */
+    public function canAccessApp($app) {
+        $trial = $this->getTrial($app);
+        if (isset($trial) && $trial->active()) {
+            return true;
+        } else if ($this->subscribed() && $this->onPlan($app) && !$this->expired()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get trial information for this app.
+     * @param string $app Application name.
+     * @return Array of trial properties.
+     */
+    public function getAppTrial($app) {
+        $trial = $this->getTrial($app);
+        if (isset($trial)) {
+
+            $tr = array();
+            $tr['trial'] = true;
+            $tr['active'] = $trial->active();
+            $tr['expires'] = $trial->expires;
+            $tr['created'] = $trial->created_at;
+            $tr['name'] = $trial->application->name;
+
+            return $tr;
+        } else {
+            return null;
+        }
+    }
+
+     /**
+     * Get subscription information for this app.
+     * @param string $app Application name.
+     * @return Array of subscription properties.
+     */
+    public function getAppSubscription($app) {
+        if ($this->subscribed() && $this->onPlan($app)) {
+            $subscription = array();
+            $subscription['trial'] = false;
+            $subscription['name'] = $this->getStripePlan();
+            $subscription['active'] = !$this->expired();
+            $subscription['expires'] = $this->getSubscriptionEndDate();
+            
+            return $subscription;    
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Wrapper to get a parsable trial object for user.
+     * @return type
+     */
+    private function getTrial($app) {
+        $trial = $this->trial;
+        if (isset($trial) && $trial->application->name == $app) {
+            return $trial;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets fillable fields for this model.
+     * @return Array with fillable fields.
+     */
+    public function getFillableFields() {
+
+        $fuser = array();
+        foreach ($this->getFillable() as
+                $f) {
+            if ($f != 'password') {
+                $fuser[$f] = $this->$f;
+            }
+        }
+        return $fuser;
     }
 
 }

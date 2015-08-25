@@ -17,4 +17,13 @@ class TrialType extends Model {
         return $this->hasMany('Zoe\TrialTypesToApplication');
     }
 
+    /**
+     * Utility to get trial type by name
+     * @param string $name
+     * @return Zoe\TrialType
+     */
+    public static function getByName($name) {
+        return self::where('name', $name)->first();
+    }
+
 }

@@ -89,5 +89,13 @@ return [
             'COLUMN_SEPARATOR' => '|',
             'ROW_SEPARATOR' => '-', 
         ],
+    
+    /**
+     * Application name
+     */
+        'application' => [
+            'NAME' => 'SC Medicaid Converter'
+            
+        ],
  
 ];

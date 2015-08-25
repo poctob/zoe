@@ -1,0 +1,49 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 24, 2015, 7:19:28 PM
+    Author     : Alex Pavlunenko <alexp@xpresstek.net>
+*/
+
+
+body,
+html {
+    margin:0;
+    padding:0;
+    color:#000;
+    background:#FDF6E3;
+}
+
+
+#wrap {
+    width:90%;
+    margin:0 auto;
+}
+
+#main {
+    float:left;
+    width:75%;
+    padding: 1%;
+    border-right: 2px black solid;
+}
+
+#sidebar {
+    float:right;
+    width:27%;
+    padding: 1%;
+}
+
+
+#footer {
+    clear:both;
+    background:#cc9;
+}
+
+hr{
+    border-color: black !important;
+}
+
+
