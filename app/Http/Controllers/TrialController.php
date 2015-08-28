@@ -36,8 +36,11 @@ class TrialController extends Controller {
     public function create(Request $request) {
         \Session::reflash();
         if ($request->user()) {
-            $application = $this->getApplication($request);
-            $trial_type = $this->getTrialType($request);
+            $app = config('zoe.application')['NAME'];
+            $tt = config('zoe.application')['TRIAL_TYPE'];
+            
+            $application = Application::getByName($app);
+            $trial_type = TrialType::getByName($tt);
 
             if (isset($application) && isset($trial_type)) {
 
@@ -48,15 +51,15 @@ class TrialController extends Controller {
                 }
 
                 try {
+                    //Clear available apps cache
+                    Cache::forget('user_plan_'.$request->user()->id);
+                    
                     $trial = Trial::makeTrial(
                             $request->user(), 
                             $application,
                             $trial_type);
                     
-                    $trial->save();
-                    
-                    //Clear available apps cache
-                    Cache::forget('user_apps_'.$request->user()->id);
+                    $trial->save();                                        
                     
                     \Session::flash('growl', ['type' => 'success', 'message' => 'Trial created successfully!']);
                     return redirect('applications');
@@ -71,34 +74,6 @@ class TrialController extends Controller {
         }
         \Session::flash('growl', ['type' => 'danger', 'message' => 'Forbidden!']);        
         return redirect('applications');
-    }
-
-    /**
-     * Utility methond to get Application object.
-     * @param Request $request
-     * @return Zoe\Application
-     */
-    private function getApplication(Request $request) {
-        if ($request->has('application')) {
-            $app = $request->get('application');
-            return Application::getByName($app);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Utility method to get TrialType object
-     * @param Request $request
-     * @return TrialType
-     */
-    private function getTrialType(Request $request) {
-        if ($request->has('type')) {
-            $type = $request->get('type');
-            return TrialType::getByName($type);
-        } else {
-            return null;
-        }
     }
 
     /**

@@ -39,8 +39,10 @@ class ApplicationsController extends Controller {
             } else {
                 \Session::flash('growl',
                         ['type' => 'danger', 'message' => 'You have no active subscriptions!']);
-
-                return view('subscribe');
+                
+                
+                $allow_trial = !($request->user()->trialExpired($app));
+                return view('subscribe', ['allow_trial'=> $allow_trial]);
             }
         }
     }

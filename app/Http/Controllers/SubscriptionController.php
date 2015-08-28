@@ -57,16 +57,23 @@ class SubscriptionController extends Controller {
         if ($request->user()) {
 
             $plan_data = $this->getSubscriptionInfoFromCache($request->user());
+            $allow_trial = true;
 
-            if (isset($plan_data['subscription'])) {
-                return view('subscription', ['subscription' => $plan_data['subscription']]);
+            if (isset($plan_data['subscription']) && $plan_data['subscription']['active']) {
+                return view('subscription',
+                        ['subscription' => $plan_data['subscription']]);
             } else if (isset($plan_data['trial'])) {
-                return view('subscription', ['subscription' => $plan_data['trial']]);
+                if ($plan_data['trial']['active']) {
+                    return view('subscription',
+                            ['subscription' => $plan_data['trial']]);
+                } else {
+                    $allow_trial = false;
+                }
             }
             \Session::flash('growl',
                     ['type' => 'danger', 'message' => 'You have no active subscriptions!']);
 
-            return view('subscribe');
+            return view('subscribe', ['allow_trial'=> $allow_trial]);
         }
     }
 
@@ -77,13 +84,13 @@ class SubscriptionController extends Controller {
             $app = config('zoe.application')['NAME'];
             $trial = $user->getAppTrial($app);
             $subscription = $user->getAppSubscription($app);
-            
+
             $plan_data = array();
             $plan_data['trial'] = $trial;
             $plan_data['subscription'] = $subscription;
-            
+
             Cache::put('user_plan_' . $user->id, $plan_data, 60);
-            return $plan_data;            
+            return $plan_data;
         }
     }
 

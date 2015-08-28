@@ -15,10 +15,16 @@
     </div>
 
     <div class="panel-body">
-        {!! Form::open(['url'=>'#', 
+        {!! Form::open(['url'=>'trial', 
         'id'=>'subscribeForm']) !!}
+        @if( isset($allow_trial) && $allow_trial)
+        <div class="form-group">
+        {!! Form::submit('Start Your Free Trial', ['type'=>'button', 'class'=>'btn btn-info']) !!}
+        </div>
+        @endif
         {!! Form::close() !!}
-        <button id="trial" type="button" class="btn btn-info">Start Your Free Trial</button>
+
+
         <button id="checkout" type="button" class="btn btn-primary">Purchase One Year Subscription</button>
     </div>
 </div>

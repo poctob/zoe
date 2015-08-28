@@ -1,6 +1,7 @@
 <?php namespace Zoe;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Trial extends Model {
 

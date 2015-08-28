@@ -9,7 +9,7 @@ $(function () {
         token: function (token) {
             var csrf=$("[name='_token']").val();
             $.post( "subscribe", { token: token.id, _token: csrf} );
-            window.location.href = '/applications';
+            window.location.href = 'applications';
         }
     });
 
@@ -19,7 +19,7 @@ $(function () {
         handler.open({
             name: 'XpressTek',
             description: 'SC Medicaid Converter 1 year subscription',
-            amount: 9900
+            amount: 9999
         });
         e.preventDefault();
     });
