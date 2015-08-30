@@ -12,6 +12,10 @@ class Application extends Model {
     public function trials() {
         return $this->hasMany('Zoe\Trial');
     }
+    
+     public function subscriptions() {
+        return $this->hasMany('Zoe\Subscription');
+    }
 
     public function trialTypesToApplications() {
         return $this->hasMany('Zoe\TrialTypesToApplication');

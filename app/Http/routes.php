@@ -34,3 +34,5 @@ Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
+
+Route::post('stripe/webhook', 'Laravel\Cashier\WebhookController@handleWebhook');

@@ -44,6 +44,10 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     public function trial() {
         return $this->hasOne('Zoe\Trial');
     }
+    
+      public function subscriptions() {
+        return $this->hasMany('Zoe\Subscription');
+    }
 
     /**
      * Checks if user has subscription to specified app
@@ -103,7 +107,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             $subscription['trial'] = false;
             $subscription['name'] = $this->getStripePlan();
             $subscription['active'] = !$this->expired();
-            $subscription['expires'] = $this->getSubscriptionEndDate();
+            
+            
+            $subs = $this->subscriptions();
+            
+            foreach($subs as $sub)
+            {
+                if($sub->application->name == $app)
+                {
+                    $subscription['expires'] = $sub->endDate;
+                    $subscription['created'] = $sub->startDate;
+                }
+            }
 
             return $subscription;
         } else {

@@ -5,6 +5,7 @@ namespace Zoe\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Cache;
+use Carbon\Carbon;
 
 class SubscriptionController extends Controller {
     /*
@@ -44,6 +45,9 @@ class SubscriptionController extends Controller {
                 $request->user()
                         ->subscription(config('zoe.application')['NAME'])
                         ->create($request->input('token'));
+                
+                $this->createLocalSubscription($request->user(), 
+                        config('zoe.application')['NAME']);
 
                 return response()->json(['success' => 'Thank You! '
                             . 'Your payment has been accepted!']);
@@ -91,6 +95,28 @@ class SubscriptionController extends Controller {
 
             Cache::put('user_plan_' . $user->id, $plan_data, 60);
             return $plan_data;
+        }
+    }
+    
+    private function createLocalSubscription($user, $application)
+    {
+        if(isset($user) && isset($application))
+        {
+            $app = Zoe\Application::getByName($application);
+            if(isset($app))
+            {
+                $now = Carbon::now();
+                $end = $now->addYear();
+                
+                $subscription = new Zoe\Subscription();
+                $subscription->startDate = $now;
+                $subscription->endDate = $end;
+                
+                $subscription->user()->associate($user);
+                $subscription->application()->associate($app);                
+                
+                $subscription->save();
+            }
         }
     }
 
