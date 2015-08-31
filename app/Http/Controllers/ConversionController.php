@@ -74,7 +74,7 @@ class ConversionController extends Controller implements iProgress, iAlert {
                 /**
                  * Move the source file out of the public directory.
                  */
-                $newdir = '../storage/exports/';
+                $newdir = '../zoe/storage/exports/';
                 $file->move($newdir, $newfilename);
 
                 $parser = new Parser($newdir . $newfilename, $newfilename,
@@ -132,7 +132,7 @@ class ConversionController extends Controller implements iProgress, iAlert {
                  * We are only letting user know the file name, so we need
                  * build the path here.
                  */
-                $fname = '../storage/exports/' . $filename;
+                $fname = '../zoe/storage/exports/' . $filename;
 
                 if (file_exists($fname)) {
                     return response()->download($fname, $files['original_name']);

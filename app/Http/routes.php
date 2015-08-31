@@ -22,6 +22,7 @@ Route::get('download/{filename}', 'ConversionController@downloadFile');
 Route::get('subscribe', 'SubscriptionController@index');
 Route::get('subscriptions', 'SubscriptionController@show');
 Route::post('subscribe', 'SubscriptionController@subscribe');
+Route::post('cancelSubscription', 'SubscriptionController@cancel');
 
 Route::get('profile', 'ProfileController@index');
 Route::post('profile', 'ProfileController@update');

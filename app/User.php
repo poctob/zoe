@@ -58,7 +58,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $trial = $this->getTrial($app);
         if (isset($trial) && $trial->active()) {
             return true;
-        } else if ($this->subscribed() && $this->onPlan($app) && !$this->expired()) {
+        } else if ($this->subscribed() && $this->getStripePlan() == $app && !$this->expired()) {
             return true;
         } else {
             return false;
@@ -89,12 +89,13 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             $tr['expires'] = $trial->expires;
             $tr['created'] = $trial->created_at;
             $tr['name'] = $trial->application->name;
+            $tr['cancelled'] = false;
 
             return $tr;
         } else {
             return null;
         }
-    }
+    }    
 
     /**
      * Get subscription information for this app.
@@ -102,12 +103,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      * @return Array of subscription properties.
      */
     public function getAppSubscription($app) {
-        if ($this->subscribed() && $this->onPlan($app)) {
+        if ($this->subscribed() && $this->getStripePlan() == $app) {
             $subscription = array();
             $subscription['trial'] = false;
-            $subscription['name'] = $this->getStripePlan();
+            $subscription['name'] = $app;
             $subscription['active'] = !$this->expired();
-            
+            $subscription['cancelled'] = null !== ($this->getSubscriptionEndDate());
             
             $subs = $this->subscriptions();
             

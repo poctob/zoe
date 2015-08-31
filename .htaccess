@@ -1,0 +1,3 @@
+RewriteCond %{REQUEST_URI} !^zpub
+RewriteRule ^(.*)$ zpub/$1 [L]
+

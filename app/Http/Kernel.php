@@ -19,6 +19,7 @@ class Kernel extends HttpKernel {
         'Illuminate\View\Middleware\ShareErrorsFromSession',
         'Zoe\Http\Middleware\VerifyCsrfToken',
         'Zoe\Http\Middleware\CleanFiles',
+        'Zoe\Http\Middleware\SecureRedirect',
     ];
 
     /**

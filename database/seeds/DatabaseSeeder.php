@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder {
         
         DB::table('trial_types')->insert([
             'name' => 'Standard 14 weeks',
+            'length' => 14,
         ]);
     }
 
