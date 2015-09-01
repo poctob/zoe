@@ -3,6 +3,7 @@
 use Zoe\User;
 use Validator;
 use Illuminate\Contracts\Auth\Registrar as RegistrarContract;
+use Zoe\Http\Controllers\MailController as Mailer;
 
 class Registrar implements RegistrarContract {
 
@@ -29,11 +30,19 @@ class Registrar implements RegistrarContract {
 	 */
 	public function create(array $data)
 	{
-		return User::create([
+		$user = User::create([
 			'name' => $data['name'],
 			'email' => $data['email'],
 			'password' => bcrypt($data['password']),
 		]);
+                
+                if(isset($user))
+                {
+                    $mailer = new Mailer();
+                    $mailer->sendWelcomeEmail($user);
+                }
+                
+                return $user;
 	}
 
 }
