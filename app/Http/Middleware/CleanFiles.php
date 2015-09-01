@@ -26,7 +26,7 @@ class CleanFiles implements TerminableMiddleware {
         if ($request->is('download/*') && $request->session()->has('convertedFiles')) {
             $files = $request->session()->get('convertedFiles');
 
-            $fname = '../storage/exports/' . $files['name'];
+            $fname = '../zoe/storage/exports/' . $files['name'];
             if (file_exists($fname)) {
                 unlink($fname);
             }
