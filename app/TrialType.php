@@ -23,7 +23,11 @@ class TrialType extends Model {
      * @return Zoe\TrialType
      */
     public static function getByName($name) {
-        return self::where('name', $name)->first();
+        if (isset($name) && strlen($name) > 0) {
+            return self::where('name', $name)->first();
+        } else {
+            return null;
+        }
     }
 
 }

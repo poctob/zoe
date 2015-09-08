@@ -11,7 +11,7 @@
     <div>
         <span>
             This is a confirmation of your resent registration with XpressTek Software. 
-            Please reply to this email if you have any questions about your account.
+            Please reply to this email if you have any questions concerning your account or registration details.
         </span>
     </div>
 </body>

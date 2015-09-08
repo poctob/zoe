@@ -22,7 +22,7 @@ class CreateTrialsTable extends Migration {
             
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('application_id')->references('id')->on('applications');
-            $table->foreign('trial_type_id')->references('id')->on('trials');
+            $table->foreign('trial_type_id')->references('id')->on('trial_types');
         });
     }
 

@@ -7,6 +7,8 @@ use Illuminate\Http\Response;
 use Cache;
 use Carbon\Carbon;
 use Zoe\Application;
+use Zoe\Subscription;
+use Zoe\Http\Controllers\MailController as Mailer;
 
 class SubscriptionController extends Controller {
     /*
@@ -114,18 +116,15 @@ class SubscriptionController extends Controller {
             $tr = $plan_data['trial'];
 
             if (isset($sub)) {
-                if($sub['cancelled'])
-                {
+                if ($sub['cancelled']) {
                     $allow_trial = false;
                 }
                 if ($sub['active']) {
-                    return view('subscription',
-                            ['subscription' => $sub]);
-                } 
+                    return view('subscription', ['subscription' => $sub]);
+                }
             } else if ($allow_trial && isset($tr)) {
                 if ($tr['active']) {
-                    return view('subscription',
-                            ['subscription' => $tr]);
+                    return view('subscription', ['subscription' => $tr]);
                 } else {
                     
                 }
@@ -143,20 +142,20 @@ class SubscriptionController extends Controller {
      * @return array user subscription plan
      */
     private function getSubscriptionInfoFromCache($user) {
-      /*  if (Cache::has('user_plan_' . $user->id)) {
-            return Cache::get('user_plan_' . $user->id);
-        } else {*/
-            $app = config('zoe.application')['NAME'];
-            $trial = $user->getAppTrial($app);
-            $subscription = $user->getAppSubscription($app);
+        if (Cache::has('user_plan_' . $user->id)) {
+          return Cache::get('user_plan_' . $user->id);
+          } else { 
+        $app = config('zoe.application')['NAME'];
+        $trial = $user->getAppTrial($app);
+        $subscription = $user->getAppSubscription($app);
 
-            $plan_data = array();
-            $plan_data['trial'] = $trial;
-            $plan_data['subscription'] = $subscription;
+        $plan_data = array();
+        $plan_data['trial'] = $trial;
+        $plan_data['subscription'] = $subscription;
 
-            Cache::put('user_plan_' . $user->id, $plan_data, 60);
-            return $plan_data;
-       // }
+        Cache::put('user_plan_' . $user->id, $plan_data, 60);
+        return $plan_data;
+        }
     }
 
     /**
@@ -171,7 +170,7 @@ class SubscriptionController extends Controller {
                 $now = Carbon::now();
                 $end = $now->addYear();
 
-                $subscription = new Zoe\Subscription();
+                $subscription = new Subscription;
                 $subscription->startDate = $now;
                 $subscription->endDate = $end;
 
@@ -179,6 +178,10 @@ class SubscriptionController extends Controller {
                 $subscription->application()->associate($app);
 
                 $subscription->save();
+
+                $mailer = new Mailer();
+                $mailer->sendSubscriptionStartEmail($request->user(),
+                        $end);
             }
         }
     }

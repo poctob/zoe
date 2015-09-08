@@ -25,7 +25,7 @@
         {!! Form::close() !!}
 
 
-        <button id="checkout" type="button" class="btn btn-primary">Purchase One Year Subscription</button>
+        <button id="checkout" type="button" class="btn btn-primary">Sign Up for Monthly Subscription</button>
     </div>
 </div>
 

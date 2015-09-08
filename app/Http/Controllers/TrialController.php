@@ -8,6 +8,7 @@ use Zoe\Application;
 use Zoe\TrialType;
 use Zoe\Trial;
 use Cache;
+use Zoe\Http\Controllers\MailController as Mailer;
 
 class TrialController extends Controller {
     /*
@@ -59,7 +60,10 @@ class TrialController extends Controller {
                             $application,
                             $trial_type);
                     
-                    $trial->save();                                        
+                    $trial->save(); 
+                    
+                    $mailer = new Mailer();
+                    $mailer->sendTrialStartEmail($request->user(), $trial->expires);
                     
                     \Session::flash('growl', ['type' => 'success', 'message' => 'Trial created successfully!']);
                     return redirect('applications');

@@ -12,8 +12,8 @@ class Application extends Model {
     public function trials() {
         return $this->hasMany('Zoe\Trial');
     }
-    
-     public function subscriptions() {
+
+    public function subscriptions() {
         return $this->hasMany('Zoe\Subscription');
     }
 
@@ -26,8 +26,8 @@ class Application extends Model {
      * @return List of trial types or null if none.
      */
     public function getAvailableTrials() {
-       
-       $trial_types_to_application = $this->trialTypesToApplications;
+
+        $trial_types_to_application = $this->trialTypesToApplications;
 
         if (isset($trial_types_to_application)) {
             $trial_types = array();
@@ -44,14 +44,19 @@ class Application extends Model {
         }
         return null;
     }
-    
+
     /**
      * Utility to get application based on its name.
      * @param string $name
      * @return Zoe\Application
      */
     public static function getByName($name) {
-        return self::where('name', $name)->first();
+
+        if (isset($name) && strlen($name) > 0) {
+            return self::where('name', $name)->first();
+        } else {
+            return null;
+        }
     }
 
 }
