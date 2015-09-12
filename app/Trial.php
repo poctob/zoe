@@ -10,7 +10,7 @@ class Trial extends Model {
      */
     public function user()
     {
-        return $this->belongsTo('\Zoe\User');
+        return $this->belongsTo('\Zoe\User', 'user_id');
     }
     
     /**
@@ -35,7 +35,7 @@ class Trial extends Model {
      */
     public function active()
     {
-        $expired = $this->expires > 0 && $this->expires < Carbon::now();
+        $expired = isset($this->expires) && $this->expires < Carbon::now();
         return !$expired;
     }
     

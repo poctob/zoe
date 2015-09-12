@@ -42,11 +42,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      * Get the trials for the user
      */
     public function trial() {
-        return $this->hasOne('Zoe\Trial');
-    }
-    
-      public function subscriptions() {
-        return $this->hasMany('Zoe\Subscription');
+        return $this->hasOne('Zoe\Trial', 'user_id');
     }
 
     /**
@@ -67,7 +63,9 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function trialExpired($app) {
         $trial = $this->getTrial($app);
-        if (isset($trial) && !$trial->active()) {
+        if (!isset($trial)) {
+            return true;
+        } else if (!$trial->active()) {
             return true;
         } else {
             return false;
@@ -95,7 +93,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         } else {
             return null;
         }
-    }    
+    }
 
     /**
      * Get subscription information for this app.
@@ -109,29 +107,36 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             $subscription['name'] = $app;
             $subscription['active'] = !$this->expired();
             $subscription['cancelled'] = null !== ($this->getSubscriptionEndDate());
-            
-            $subs = $this->subscriptions();
-            
-            foreach($subs as $sub)
-            {
-                if($sub->application->name == $app)
-                {
-                    $subscription['expires'] = $sub->endDate;
-                    $subscription['created'] = $sub->startDate;
-                }
-            }
 
             return $subscription;
         } else {
             return null;
         }
     }
+    
+    /**
+     * Checks if trial is allowed for this user/application
+     * @param type $app Application
+     * @return boolean True if trial is allowed/false otherwise
+     */
+    public function isTrialAllowed($app)
+    {
+        $subscribed = ($this->subscribed() && $this->getStripePlan() == $app);
+        
+        if(!$subscribed)
+        {
+            $trial = $this->getTrial($app);
+            return !isset($trial);
+        }
+        
+        return false;
+    }
 
     /**
      * Wrapper to get a parsable trial object for user.
      * @return type
      */
-    private function getTrial($app) {
+    protected function getTrial($app) {
         $trial = $this->trial;
         if (isset($trial) && $trial->application->name == $app) {
             return $trial;

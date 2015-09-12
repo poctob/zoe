@@ -3,8 +3,6 @@
 
 use Laravel\Cashier\WebhookController as BaseController;
 
-class StripeWebHookController extends BaseController {
-
-	
+class StripeWebHookController extends BaseController {	
 
 }

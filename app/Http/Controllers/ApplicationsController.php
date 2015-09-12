@@ -41,7 +41,7 @@ class ApplicationsController extends Controller {
                         ['type' => 'danger', 'message' => 'You have no active subscriptions!']);
                 
                 
-                $allow_trial = !($request->user()->trialExpired($app));
+                $allow_trial = $request->user()->isTrialAllowed($app);
                 return view('subscribe', ['allow_trial'=> $allow_trial]);
             }
         }

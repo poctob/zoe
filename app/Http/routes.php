@@ -13,7 +13,7 @@
 
 Route::get('/', 'WelcomeController@index');
 
-Route::get('home', 'HomeController@index');
+Route::get('home', 'ApplicationsController@index');
 
 Route::post('convert_file', 'ConversionController@convert');
 Route::get('convert', 'ConversionController@index');

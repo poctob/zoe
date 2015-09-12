@@ -2,6 +2,10 @@
 
 @section('morecontent')
 {!! Html::script('js/app.js') !!}
+@if ($subscription['trial'])
+{!! Html::script('https://checkout.stripe.com/checkout.js') !!}
+{!! Html::script('js/checkout.js') !!}
+@endif
 
 <ul class="nav nav-pills">
     <li role="presentation"><a href="applications">Applications</a></li>
@@ -36,7 +40,7 @@
                         @endif
                     </span>
                     *
-                     <span>
+                    <span>
                         @if ($subscription['cancelled'])
                         Canceled, will not renew
                         @endif
@@ -45,21 +49,18 @@
                 </h3>
             </div>
             <div class="panel-body">
-                <div class="well well-sm">Expires on: 
-                    @if ( isset($subscription['expires']))
-                    {{ $subscription['expires'] }}
-                    @else
-                    N/A
-                    @endif
+                @if ( isset($subscription['expires']))
+                <div class="well well-sm">Expires on:                     
+                    {{ $subscription['expires'] }}                    
                 </div>
+                @endif
 
-                <div class="well well-sm">Created on: 
-                    @if ( isset($subscription['created']))
+                @if ( isset($subscription['created']))
+                <div class="well well-sm">Created on:                     
                     {{ $subscription['created']->toFormattedDateString()  }}
-                    @else
-                    N/A
-                    @endif
                 </div>
+                @endif
+
 
                 @if( !$subscription['trial'] && $subscription['active'] && !$subscription['cancelled'])
 
@@ -86,7 +87,7 @@
                                 </button>
                                 <h4 class="modal-title" id="myModalLabel">Confirm Subscription Cancellation</h4>
                             </div>
-                            
+
                             <div class="modal-body">
                                 Please note that by canceling the subscription, 
                                 your application access will still be valid 
@@ -94,7 +95,7 @@
                                 When your current period expires, you will 
                                 no longer have access to the application.
                             </div>
-                            
+
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="button" id="cancelConfirmButton" class="btn btn-primary">Confirm</button>
@@ -106,6 +107,12 @@
                 @endif
             </div>
         </div>
+        @if ($subscription['trial'])
+        {!! Form::open(['url'=>'#', 
+        'id'=>'subscribeForm']) !!}               
+        {!! Form::close() !!}
+        <button id="checkout" type="button" class="btn btn-primary">Sign Up for Monthly Subscription</button>
+        @endif
 
     </div>
 </div>

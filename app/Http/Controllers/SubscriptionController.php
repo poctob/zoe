@@ -111,18 +111,16 @@ class SubscriptionController extends Controller {
         if ($request->user()) {
 
             $plan_data = $this->getSubscriptionInfoFromCache($request->user());
-            $allow_trial = true;
+            $app = config('zoe.application')['NAME'];
+            $allow_trial = $request->user()->isTrialAllowed($app);
             $sub = $plan_data['subscription'];
             $tr = $plan_data['trial'];
 
             if (isset($sub)) {
-                if ($sub['cancelled']) {
-                    $allow_trial = false;
-                }
                 if ($sub['active']) {
                     return view('subscription', ['subscription' => $sub]);
                 }
-            } else if ($allow_trial && isset($tr)) {
+            } else if (isset($tr)) {
                 if ($tr['active']) {
                     return view('subscription', ['subscription' => $tr]);
                 } else {
