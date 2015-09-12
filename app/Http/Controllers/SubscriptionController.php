@@ -54,20 +54,18 @@ class SubscriptionController extends Controller {
         if ($request->user() && $request->has('token')) {
 
             try {
-                //Clear available apps cache
-                Cache::forget('user_plan_' . $request->user()->id);
-
                 $request->user()
                         ->subscription(config('zoe.application')['NAME'])
                         ->create($request->input('token'));
 
-                $this->createLocalSubscription($request->user(),
-                        config('zoe.application')['NAME']);
+                $mailer = new Mailer();
+                $mailer->sendSubscriptionStartEmail($request->user());
 
                 \Session::flash('growl',
                         ['type' => 'success',
                     'message' => 'Your subscription has been created!']);
 
+                Cache::forget('user_plan_' . $request->user()->id);
                 return $this->show($request);
             } catch (Exception $e) {
                 return response()->json(['error' => $e->getMessage()], 500);
@@ -85,16 +83,20 @@ class SubscriptionController extends Controller {
             $app = config('zoe.application')['NAME'];
             $subscription = $request->user()->getAppSubscription($app);
             if (isset($subscription) && $subscription['active']) {
-                //Clear available apps cache
-                Cache::forget('user_plan_' . $request->user()->id);
 
                 $request->user()->subscription()->cancel();
+                
+                $mailer = new Mailer();
+                $mailer->sendSubscriptionEndEmail($request->user());
 
                 \Session::flash('growl',
                         ['type' => 'warning',
                     'message' => 'Your subscription has been cancelled!']);
 
-                return view('subscribe', ['allow_trial' => false]);
+                //Clear available apps cache
+                Cache::forget('user_plan_' . $request->user()->id);
+
+                return $this->show($request);
             }
         }
         \Session::flash('growl',
@@ -140,7 +142,7 @@ class SubscriptionController extends Controller {
      * @return array user subscription plan
      */
     private function getSubscriptionInfoFromCache($user) {
-        if (Cache::has('user_plan_' . $user->id)) {
+          if (Cache::has('user_plan_' . $user->id)) {
           return Cache::get('user_plan_' . $user->id);
           } else { 
         $app = config('zoe.application')['NAME'];
@@ -153,35 +155,7 @@ class SubscriptionController extends Controller {
 
         Cache::put('user_plan_' . $user->id, $plan_data, 60);
         return $plan_data;
-        }
-    }
-
-    /**
-     * Creates local subscription to keep track of expiration dates.
-     * @param User $user
-     * @param String $application application name
-     */
-    private function createLocalSubscription($user, $application) {
-        if (isset($user) && isset($application)) {
-            $app = Application::getByName($application);
-            if (isset($app)) {
-                $now = Carbon::now();
-                $end = $now->addYear();
-
-                $subscription = new Subscription;
-                $subscription->startDate = $now;
-                $subscription->endDate = $end;
-
-                $subscription->user()->associate($user);
-                $subscription->application()->associate($app);
-
-                $subscription->save();
-
-                $mailer = new Mailer();
-                $mailer->sendSubscriptionStartEmail($request->user(),
-                        $end);
-            }
-        }
-    }
+          }
+    }   
 
 }

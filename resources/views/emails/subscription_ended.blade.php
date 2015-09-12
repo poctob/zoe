@@ -7,23 +7,20 @@
 	<title>XpressTek Software Subscription Confirmation</title>
 </head>
 <body>
-    <h3>Hello {{ $user->name }}!</h3>
+    <h3>Hello {{ $user->name }} !</h3>
     <div>
         <span>
-            This is a confirmation of you recently purchased subscription for XpressTek Software.             
+            This is a notification that your subscription for XpressTek Software has ended.             
         </span>
     </div>
     <div>
-        Your application access is now active.
-    </div>
-    <div>
-        Your subscription will renew automatically on a monthly basis.
-        Please visit your account subscription page to cancel at any time.
+        If you would like to continue using the application,
+        please log-in into your account to renew.
     </div>
     <hr />
     <div>
         Please contact sales@xpresstek.net if you have any concerns or questions 
-        regarding your subscription.
+        regarding your trial or subscription.
     </div>
      <hr />
      <div>
