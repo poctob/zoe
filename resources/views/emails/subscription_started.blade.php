@@ -10,7 +10,7 @@
     <h3>Hello {{ $user->name }}!</h3>
     <div>
         <span>
-            This is a confirmation of you recently purchased subscription for XpressTek Software.             
+            This is a confirmation of your recently purchased subscription for XpressTek Software.             
         </span>
     </div>
     <div>

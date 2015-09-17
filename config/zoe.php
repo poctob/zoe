@@ -95,7 +95,7 @@ return [
      */
         'application' => [
             'NAME' => 'SC Medicaid Converter',
-            'TRIAL_TYPE' => 'Standard 14 weeks'
+            'TRIAL_TYPE' => 'Standard 14 days'
             
         ],
  
