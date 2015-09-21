@@ -37,6 +37,11 @@ class ProfileController extends Controller {
     }
 
     public function update(Request $request) {
+        $this->validate($request, [
+            'name' => 'required|min:1',
+            'email'=> 'required|email',
+        ]);
+        
         if ($request->user()) {
             try {
                 if ($request->has('name')) {
