@@ -303,10 +303,10 @@ class Table {
         $result = strcmp($a->getLastName(), $b->getLastName());
         if($result == 0)
         {
-            $result = strcmp($a->getRecipientID(), $b->getRecipientID());
+            $result = strcmp($a->getRecipientID(), $b->getRecipientID());            
         }
         return $result;
-    }
+    }       
 
     /**
      * Exports table to excel.
@@ -325,7 +325,8 @@ class Table {
             $rows = 2;
             foreach ($this->claims as
                     $claim) {
-
+                                           
+                $claim->sortSubClaimsByDate();                
                 $rows += $this->exportClaim($claim, $rows);
             }
 

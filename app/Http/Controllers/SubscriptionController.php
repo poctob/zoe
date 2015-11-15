@@ -5,8 +5,6 @@ namespace Zoe\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Cache;
-use Carbon\Carbon;
-use Zoe\Application;
 use Zoe\Subscription;
 use Zoe\Http\Controllers\MailController as Mailer;
 

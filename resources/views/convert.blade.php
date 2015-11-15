@@ -7,6 +7,7 @@
 
 <ul class="nav nav-pills">
     <li role="presentation" class="active"><a href="#">Applications</a></li>
+    <li role="presentation"><a href="options">Options</a></li>
     <li role="presentation"><a href="subscriptions">Subscriptions</a></li>    
     <li role="presentation"><a href="profile">Profile</a></li>
 </ul>
@@ -22,7 +23,8 @@
         'id'=>'uploadForm', 
         'class'=>'dropzone', 
         'name'=> 'dropzoneForm', 'files'=>true]) !!}
-        {!! Form::close() !!}
+        {!! Form::close() !!}              
+
     </div>
 </div>
 @endsection

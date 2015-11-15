@@ -9,6 +9,7 @@
 
 <ul class="nav nav-pills">
     <li role="presentation"><a href="applications">Applications</a></li>
+    <li role="presentation"><a href="options">Options</a></li>
     <li role="presentation" class="active"><a href="#">Subscriptions</a></li>    
     <li role="presentation"><a href="profile">Profile</a></li>
 </ul>

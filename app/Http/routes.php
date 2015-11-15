@@ -29,6 +29,10 @@ Route::post('profile', 'ProfileController@update');
 
 Route::get('applications', 'ApplicationsController@index');
 
+Route::get('options', 'OptionsController@index');
+
+Route::post('options', 'OptionsController@save');
+
 Route::post('trial', 'TrialController@create');
 
 Route::controllers([

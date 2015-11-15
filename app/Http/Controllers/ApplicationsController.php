@@ -35,14 +35,28 @@ class ApplicationsController extends Controller {
             $app = config('zoe.application')['NAME'];
 
             if ($request->user()->canAccessApp($app)) {
-                return view('convert');
+
+                $cols = config('zoe.columns');
+                $columns = array();
+
+                foreach ($cols as
+                        $k =>
+                        $v) {
+                    if ($k != 'MAX') {
+                        $c = array();
+                        $c['name'] = $k;
+                        $c['checked'] = true;
+                        $columns[] = $c;
+                    }
+                }
+                return view('convert', ['columns' => $columns]);
             } else {
                 \Session::flash('growl',
                         ['type' => 'danger', 'message' => 'You have no active subscriptions!']);
-                
-                
+
+
                 $allow_trial = $request->user()->isTrialAllowed($app);
-                return view('subscribe', ['allow_trial'=> $allow_trial]);
+                return view('subscribe', ['allow_trial' => $allow_trial]);
             }
         }
     }

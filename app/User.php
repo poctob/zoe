@@ -41,6 +41,13 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     /**
      * Get the trials for the user
      */
+    public function options() {
+        return $this->hasMany('Zoe\UserOptions', 'user_id');
+    }
+
+    /**
+     * Get the trials for the user
+     */
     public function trial() {
         return $this->hasOne('Zoe\Trial', 'user_id');
     }
@@ -70,6 +77,26 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         } else {
             return false;
         }
+    }
+
+    /**
+     * Retrieves option value for specified option key
+     * @param type $option Option key
+     * @return type String value of options.
+     */
+    public function getOption($option) {
+        $options = $this->options;
+
+        if (isset($options)) {
+            foreach ($options as
+                    $opt) {
+                if ($opt->option == $option) {
+                    return $opt->value;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -113,22 +140,20 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             return null;
         }
     }
-    
+
     /**
      * Checks if trial is allowed for this user/application
      * @param type $app Application
      * @return boolean True if trial is allowed/false otherwise
      */
-    public function isTrialAllowed($app)
-    {
+    public function isTrialAllowed($app) {
         $subscribed = ($this->subscribed() && $this->getStripePlan() == $app);
-        
-        if(!$subscribed)
-        {
+
+        if (!$subscribed) {
             $trial = $this->getTrial($app);
             return !isset($trial);
         }
-        
+
         return false;
     }
 

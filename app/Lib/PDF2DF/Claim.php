@@ -146,6 +146,27 @@ class Claim {
     public function setSubclaims($subclaims) {
         $this->subclaims = $subclaims;
     }
+    
+    public function sortSubClaimsByDate()
+    {
+        usort($this->subclaims, array($this, "subClaimCmp"));
+    }
+    
+     /**
+     * Sorts sublcaims based on service date.
+     * @param \Zoe\Lib\PDF2DF\SubClaim $a LHS
+     * @param \Zoe\Lib\PDF2DF\SubClaim $b RHS
+     * @return int -1 if a is smaller than b, 0 if equal, 1 if a is larger than b
+     */
+    public function subClaimCmp(SubClaim $a, SubClaim $b)
+    {
+        if( $a->getServiceDate() == $b->getServiceDate())
+        {
+            return 0;
+        }
+        
+        return $a->getServiceDate() < $b->getServiceDate() ? -1 : 1;
+    }
 
     /**
      * Adds subclaim to a list
